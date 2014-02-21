@@ -1,4 +1,4 @@
-# Flocking: Needs a Title
+# Flocking.js: Declarative Javascript Audio for Artists
 
 _Flocking_ is a web-based framework for audio synthesis, composition, and performance [1]. This paper will position Flocking within the emerging context of web audio tools and techniques, providing an overview of the challenges and potential of making music on the web. By embracing the ubiquity and flexibility of web-based technologies, Flocking attempts to support a broad community of digital instrument designers and composers. Written entirely in JavaScript, Flocking applications can run on a variety of platforms including traditional desktop operating systems as well as mobile platforms. Flocking also is used by the author to create sound installations and compositions on embedded platforms such as the popular Raspberry Pi computer using Node.js. Several recent pieces will be demonstrated.
 
