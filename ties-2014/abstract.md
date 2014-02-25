@@ -1,4 +1,4 @@
-# Flocking.js: Declarative Javascript Audio for Artists
+# Flocking.js: Javascript Audio for Artists
 
 _Flocking_ is a web-based framework for audio synthesis, composition, and performance [1]. This paper will position Flocking within the emerging context of web audio tools and techniques, providing an overview of the challenges and potential of making music on the web. By embracing the ubiquity and flexibility of web-based technologies, Flocking attempts to support a broad community of digital instrument designers and composers. Written entirely in JavaScript, Flocking applications can run on a variety of platforms including traditional desktop operating systems as well as mobile platforms. Flocking also is used by the author to create sound installations and compositions on embedded platforms such as the popular Raspberry Pi computer using Node.js. Several recent pieces will be demonstrated.
 
@@ -27,13 +27,15 @@ _Example 1_: An synth definition for a simple frequency modulation instrument, c
 
 Flocking provides a very flexible means for reusing and adapting instruments and compositions. A simple but powerful object merging algorithm allows musicians to overlay their own customizations onto an existing instrument without having to directly change its internals. This helps to promote the sharing of modules amongst a body of compositions and across communities of digital instrument designers.
 
-Recently, support has been added for Open Sound Control-based hardware controllers [3], providing a way for musicians to bind physical input sources to their Flocking-based software instruments. An example of a simple OSC controller, dubbed the _Flock Box_, will be demonstrated, illustrating Flocking's flexible tools for binding and transforming control input to suit different instruments and performance scenarios. The Flock Box consists of four potentiometers connected to a Teensy embedded controller [4] that issues OSC value changes each time a pot is moved.
-
 _Image 1_: The _Flock Box_, a home-built Open Sound Control controller that can be used with Flocking:
 
 ![The Flock Box](images/flockbox.jpg)
 
-Using Flocking's Open Sound Control library, the OSC addresses and values sent by the Flock Box and other OSC sources can be mapped and transformed to arbitrary inputs within an instrument's unit generator tree using a declarative _input map_ specification.
+Recently, support has been added for Open Sound Control [3] specifically to handle hardware controllers. An example of a simple OSC controller, dubbed the _Flock Box_, will be demonstrated. The Flock Box consists of four potentiometers connected to a Teensy embedded controller [4] that issues OSC value changes each time a pot is moved. (MENTION NODE.JS HERE)
+
+
+
+The OSC data sent by the Flock Box and other OSC sources can be easily mapped to arbitrary inputs within an instrument's unit generator tree using a declarative _input map_ specification.
 
 _Example 2_: A declarative input map, which binds instrument inputs (keys) to incoming OSC message addresses (values).
 
