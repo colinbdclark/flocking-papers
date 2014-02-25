@@ -1,4 +1,4 @@
-# Flocking.js: Javascript Audio for Artists
+# Flocking.js: JavaScript Audio for Artists
 
 _Flocking_ is a web-based framework for audio synthesis, composition, and performance [1]. This paper will position Flocking within the emerging context of web audio tools and techniques, providing an overview of the challenges and potential of making music on the web. By embracing the ubiquity and flexibility of web-based technologies, Flocking attempts to support a broad community of digital instrument designers and composers. Written entirely in JavaScript, Flocking applications can run on a variety of platforms including traditional desktop operating systems as well as mobile platforms. Flocking also is used by the author to create sound installations and compositions on embedded platforms such as the popular Raspberry Pi computer using Node.js. Several recent pieces will be demonstrated.
 
@@ -31,11 +31,7 @@ _Image 1_: The _Flock Box_, a home-built Open Sound Control controller that can 
 
 ![The Flock Box](images/flockbox.jpg)
 
-Recently, support has been added for Open Sound Control [3] specifically to handle hardware controllers. An example of a simple OSC controller, dubbed the _Flock Box_, will be demonstrated. The Flock Box consists of four potentiometers connected to a Teensy embedded controller [4] that issues OSC value changes each time a pot is moved. (MENTION NODE.JS HERE)
-
-
-
-The OSC data sent by the Flock Box and other OSC sources can be easily mapped to arbitrary inputs within an instrument's unit generator tree using a declarative _input map_ specification.
+Recently, support has been added for Open Sound Control [3] specifically to handle hardware controllers. An example of a simple OSC controller, dubbed the _Flock Box_, will be demonstrated. The Flock Box consists of four potentiometers connected to a Teensy embedded controller [4] that issues OSC value changes each time a pot is moved. A Node.js server listens for OSC events on the serial port and forwards them on to Flocking. The OSC data sent by the Flock Box and other OSC sources can be easily mapped to arbitrary inputs within an instrument's unit generator tree using a declarative _input map_ specification.
 
 _Example 2_: A declarative input map, which binds instrument inputs (keys) to incoming OSC message addresses (values).
 
