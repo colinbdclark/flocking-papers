@@ -12,14 +12,14 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%% Some useful packages %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%% See related documentation %%%%%%%%%%%%%%%%%%%%%%%%%%
-%\usepackage{amsmath} % popular packages from Am. Math. Soc. Please use the 
+%\usepackage{amsmath} % popular packages from Am. Math. Soc. Please use the
 %\usepackage{amssymb} % related math environments (split, subequation, cases,
 %\usepackage{amsfonts}% multline, etc.)
 %\usepackage{bm}      % Bold Math package, defines the command \bf{}
 %\usepackage{paralist}% extended list environments
-%%subfig.sty is the modern replacement for subfigure.sty. However, subfig.sty 
-%%requires and automatically loads caption.sty which overrides class handling 
-%%of captions. To prevent this problem, preload caption.sty with caption=false 
+%%subfig.sty is the modern replacement for subfigure.sty. However, subfig.sty
+%%requires and automatically loads caption.sty which overrides class handling
+%%of captions. To prevent this problem, preload caption.sty with caption=false
 %\usepackage[caption=false]{caption}
 %\usepackage[font=footnotesize]{subfig}
 
@@ -48,13 +48,13 @@
     pdftitle={\papertitle},
     pdfauthor={\firstauthor, \secondauthor},
     bookmarksnumbered, % use section numbers with bookmarks
-    pdfstartview=XYZ % start with zoom=100% instead of full screen; 
+    pdfstartview=XYZ % start with zoom=100% instead of full screen;
                      % especially useful if working with a big screen :-)
    ]{hyperref}
   %\pdfcompresslevel=9
 
   \usepackage[pdftex]{graphicx}
-  % declare the path(s) where your graphic files are and their extensions so 
+  % declare the path(s) where your graphic files are and their extensions so
   %you won't have to specify these with every instance of \includegraphics
   \graphicspath{{./figures/}}
   \DeclareGraphicsExtensions{.pdf,.jpeg,.png}
@@ -68,7 +68,7 @@
   ]{hyperref}  % hyperrefs are active in the pdf file after conversion
 
   \usepackage[dvips]{epsfig,graphicx}
-  % declare the path(s) where your graphic files are and their extensions so 
+  % declare the path(s) where your graphic files are and their extensions so
   %you won't have to specify these with every instance of \includegraphics
   \graphicspath{{./figures/}}
   \DeclareGraphicsExtensions{.eps}
@@ -91,8 +91,8 @@
 \title{\papertitle}
 
 % Authors
-% Please note that submissions are NOT anonymous, therefore 
-% authors' names have to be VISIBLE in your manuscript. 
+% Please note that submissions are NOT anonymous, therefore
+% authors' names have to be VISIBLE in your manuscript.
 %
 % Single address
 % To use with only one author or several with the same address
@@ -128,25 +128,17 @@
 \capstarttrue
 %
 \begin{abstract}
-Flocking.js is an awesome language for the propogation of awesomeness in sound and web audio.
+Flocking.js is an awesome language for the propagation of awesomeness in sound and web audio. (150-200 words)
 \end{abstract}
 %
 
 \section{Introduction}\label{sec:introduction}
 
-Flocking.js\footnote{http://flockingjs.org/}
+Flocking\footnote{http://flockingjs.org/} is a framework for audio synthesis and music composition written in JavaScript. It takes a unique approach to solving several of the typical architectural problems faced by computer music environments, emphasizing a declarative style that is closely aligned with the principles of the web.
 
+In Flocking, instruments and scores are defined as JavaScript Object Notation (JSON) objects. JSON is a subset of the JavaScript language that is used widely across the web for exchanging data. By representing the basic building blocks of synthesis declaratively, Flocking’s goal is to enable the growth of an ecosystem of tools that can easily parse and understand the logic and semantics of a digital instrument. This is particularly useful for supporting generative composition (where programs can generate new instruments and scores algorithmically), graphical tools (for programmers and non-programmers alike to collaborate with), and new modes of social programming that allow musicians to easily adapt, extend, and rework existing instruments without having to "fork" their code.
 
-
-\section{Background}
-
-Lonce wrote a great article \cite{DBLP:journals/comj/WyseS13}
-Roberts, Wakefield, and Wright won best paper for this \cite{roberts_web_2013}
-
-
-\section{The Language}
-
-Flocking.js is a declarative language. You can set up systems, much like modular synthesizers, and let them run. The following is an example of simple system consisting of a single sine oscillator. 
+In contrast to other emerging web audio libraries and tools, Flocking provides a robust, optimized, and well-tested architecture that explicitly supports extensibility and long-term growth. Flocking runs in nearly any modern JavaScript environment, including desktop and mobile browsers (Chrome, Firefox, and Safari) as on embedded devices with Node.js
 
 \begin{verbatim}
 var synth = flock.synth({
@@ -158,23 +150,40 @@ var synth = flock.synth({
 });
 \end{verbatim}
 
-Declarative programming is the source of significant debate and confusion within both the academic literature (Lloyd 2) and the forums of practicing programmers (C2 Wiki). This is due, in part, to a preponderance of vague and partial definitions that fail to provide a coherent model for understanding the approach. Since we specifically characterize Flocking as a declarative framework, it is worth exploring the specifics of what this means to computer musicians, both in principle and in practice.
+\section{Background}
 
-J.W. Lloyd's informal definition of declarative programming is probably the most helpful starting point for establishing a pragmatic understanding of the idiom. "Declarative programming involves stating {\it what} is to be computed but not necessarily {\it how} it is to be computed" (1). The emphasis here is on the logical or semantic aspects of computation, rather than on low-level sequencing and control flow. The familiar unit generator abstraction, established in the 1950s by Max Mathews in Music IV (34), represents a partial example of a declarative approach. Unit generators represent a higher-level abstraction for audio signals; they're building blocks that a musician connects together to produce a working instrument that is managed by the synthesis engine. The musician doesn't directly specify the line-by-line sequencing of {\it how} a sine wave, for example, is produced. Rather, she specifies the desired signal-generating processes by name and lets the synthesis environment do the rest.
+Lonce wrote a great article \cite{DBLP:journals/comj/WyseS13}
+Roberts, Wakefield, and Wright won best paper for this \cite{roberts_web_2013}
 
-There is, however, a more important aspect to declarative programming than just abstracting away sequential details. Truly declarative programming involves the ability to write programs that are themselves represented in a format that can be processed by other programs as data. Paul Graham describes the declarative nature of Lisp, saying "Lisp has no syntax. You write programs in the parse trees... [that] are fully accessible to your programs. You can write programs that manipulate them... programs that write programs."
 
-The essential characteristic of declarative programming, then, is the unification of "code" with "data," opening up the potential to create software programs that can be understood, manipulated, and transformed by other programs, not just by a compiler. This quality is not just of theoretical interest for musicians. We argue that declarative programming has the potential to bridge the long-standing gap in the computer music world between musicians who write code and those who use graphical patching environments like Max or Pd.
+\section{The Framework}
 
-The key to Flocking's declarative approach is JSON, the JavaScript Object Notation format. JSON is a lightweight data interchange format based on a subset of JavaScript that can be parsed and understood in nearly any programming language (Crockford {\it json.org}). JSON provides two primary data structures that are practically universal across programming languages: 
+\subsection{Declarative Programming}
+We described Flocking above as a declarative framework, and this characteristic is essential to understanding its design. Though clear, unambiguous definitions of the technique are scarce both in the academic literature (Lloyd 2) and the forums of practicing programmers (C2 Wiki), declarative programming can be understood in the context of Flocking as having two essential characteristics:
+it emphasizes a high-level, semantic view of a program’s logic and structure
+it represents programs as data structures that can be understood by other programs
+
+J.W. Lloyd's informal definition of declarative programming is probably the most helpful starting point for establishing a pragmatic understanding of the first point. "Declarative programming involves stating {\it what} is to be computed but not necessarily {\it how} it is to be computed" (1). The emphasis here is on the logical or semantic aspects of computation, rather than on low-level sequencing and control flow. For musicians, the familiar unit generator abstraction established in the 1950s by Max Mathews in Music IV (34) offers at least a partial example of the declarative approach. Unit generators represent a higher-level abstraction for audio signals; they're building blocks that a musician specifies and connects together. The synthesis engine takes care of producing a working instrument from this “orchestra” specification, abstracting away the process of actually producing the samples for output. In this model, the musician doesn't directly specify the line-by-line sequencing of {\it how} a sine wave, for example, is produced. Rather, she specifies the desired signal-generating processes by name and lets the synthesis environment do the rest.
+
+The second point, relating to the use of common data structures to represent programs, is the more subtle and also more significant aspect of Flocking’s declarative design. Traditional imperative programming styles are typically intended for an “audience of one”--the compiler. Though code is often shared amongst multiple developers, it can’t be understood or manipulated by a variety of other programs aside from the compiler.
+
+In contrast, declarative programming involves the ability to write programs that are themselves represented in a format that can be processed by other programs as ordinary data. The Lisp family of languages are a well-known example of this approach. Paul Graham describes the declarative nature of Lisp, saying it "has no syntax. You write programs in the parse trees... [that] are fully accessible to your programs. You can write programs that manipulate them... programs that write programs." While Flocking is written in the JavaScript programming language, it shares with Lisp the idea of expression programs within data structures (written as JSON), which are fully available for manipulation by other programs.
+
+(example that further clarifies how this is the case in Flocking)
+
+\subsection{JSON}
+
+The key to Flocking's declarative approach is JSON, the JavaScript Object Notation format. JSON is a lightweight data interchange format based on a subset of JavaScript that can be parsed and understood in nearly any programming language (Crockford {\it json.org}). JSON provides two primary data structures that are practically universal across programming languages:
 
 1. objects consisting of key/value pairs (i.e. dictionaries or associative arrays)
 2. ordered lists (i.e. arrays or lists)
 
-Since JSON's syntax and semantics are identical to the Object and Array type literals in JavaScript, JSON is an exceptionally convenient language for representing data in web applications. All of Flocking's musical primitives are expressed as trees of JSON objects.
+Since JSON's syntax and semantics are identical to the Object and Array type literals in JavaScript, JSON is an exceptionally convenient language for representing data in web applications. All of Flocking's musical primitives are expressed as trees of JSON objects. Where Max and PD provide compositionality by defining patch objects, and SuperCollider and ChucK provide this with functions, Flocking enables exceptional compositionality through "documents"--declarative JSON specifications--and a simple document merging process enabled by the Infusion framework.
 
+\subsection{Infusion}
+Infusion, infusion, infusion, example of infusion.
 
-Where, as mentioned in Wyse \& Subramanian, Max and PD provide compositionality by defining patch objects, and SuperCollider and ChucK provide this with functions, Flocking enables exceptional compositionality through "documents"--declarative JSON specifications--and a simple document merging process enabled by the Infusion framework.
+(example of what an infused band of instruments looks like)
 
 \section{Web Audio}
 
@@ -232,7 +241,7 @@ With just-in-time compilers such as Google's V8 and Mozilla's IonMonkey, we beli
 %\begin{figure}[h]
 %\centering
 %\includegraphics[width=0.9\columnwidth]{Athens_University_main_building.pdf}
-%\caption{Figure captions should be placed below the figure, 
+%\caption{Figure captions should be placed below the figure,
 %exactly like this.
 %This photo shows the main building of the University of Athens.\label{fig:example}}
 %\end{figure}
@@ -255,7 +264,7 @@ Awesomeness has been demonstrated.
 
 \begin{acknowledgments}
 Funding agencies? Pets?
-\end{acknowledgments} 
+\end{acknowledgments}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %bibliography here
