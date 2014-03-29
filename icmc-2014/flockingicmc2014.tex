@@ -178,6 +178,17 @@ Different computer music systems take radically different approaches to modellin
 
 Born out of frustration with the complete syntatic and semantic separation of unit generators and Patterns in SuperCollider---both of which represent changing values over time---Flocking attempts to smooth over this systemic distinction between signal-level events and scheduled events by adopting a single, unified representation of change. In Flocking, changes at both levels are represented as trees of unit generators. The only difference is the rate at which these unit generators are evaluated. A single abstraction for changes provides less ``conceptual surface" for newcomers to learn, and enables instruments to be used in different contexts, both at the macro and micro levels. This topic is discussed further, with examples, in the \ref{sec:Scheduling}.
 
+\section{How Flocking Works}
+
+Cover:
+
+\begin{enumerate}
+\item the main components of the system: the environment, synths, unit generators, and the scheduler
+\item an example of a simple synth, and how they are invoked with an ``options document" containing a ``synthDef"
+\item discuss the idea of layering---that flocking is built from low-level functions plus a framework that operates on common data structures in an ``inversion of control" manner
+\item show a more complex example of a synth and how values can be changed on it
+\end{enumerate}
+
 \section{The Framework}
 
 \subsection{Declarative Programming}
@@ -205,12 +216,20 @@ The key to Flocking's declarative approach is JSON, the JavaScript Object Notati
 \item ordered lists (i.e. arrays or lists)
 \end{enumerate}
 
+(need to better introduce this issue of ''compositionality" by citing Wyse)
+
 Since JSON's syntax and semantics are identical to the Object and Array type literals in JavaScript, JSON is an exceptionally convenient language for representing data in web applications. All of Flocking's musical primitives are expressed as trees of JSON objects. These objects can be trivially serialized, traversed, manipulated, and merged with other objects. Where Max and PD provide compositionality by creating patch objects, and SuperCollider and ChucK provide this with functions, Flocking enables exceptional compositionality through ``documents"--declarative JSON specifications--and a simple document merging process enabled by the Infusion framework.
 
 \subsection{Infusion}
-Infusion, infusion, infusion, example of infusion.
 
-(example of what an infused band of instruments looks like)
+Cover:
+
+\begin{enumerate}
+\item what Infusion is and its ``research goals"--cite the HCII paper
+\item show an example of defining a ``band" and scheduler in the Infusionic way
+\item show an example of how an existing synth can be adapted, modified, and overridden without changing code (perhaps a simple FM synth is a good example, so we can contrast it with something like Gibberish, where you have to take their synths or leave em.)
+\item the infusionic approach is a choice, but increasingly higher-level abstractions will be offered using this approach, where the band is just the first example
+\end{enumerate}
 
 \section{Scheduling}
 
