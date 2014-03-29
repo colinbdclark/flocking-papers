@@ -176,7 +176,9 @@ Another key challenge that computer music environments often face is how to mode
 
 Different computer music systems take radically different approaches to modeling these distinctions. For example, Max historically only supported an event-based approach that was optimized for changes coming from external controller, so signal-level changes were later added as a special type of event (cite Puckett, Max at 20). SuperCollider, on the other hand, makes a strict distinction between signal-level changes, which occur in the isolated environment of the server (cite McCartney) and {\it Patterns}, which provide a completely distinct syntactic construct for scheduling higher-level musical changes (cite SuperCollider Book Patterns chapter).
 
-Flocking attempts to smooth over some of these systemic distinction between types of changes---particularly the distinction between signal-level events and scheduled events---by adopting a single, unified representation of change. (the unit generator...)
+Born out of frustration with the complete syntatic and semantic separation of unit generators and Patterns in SuperCollider---both of which represent changing values over time---Flocking attempts to smooth over this systemic distinction between signal-level events and scheduled events by adopting a single, unified representation of change. In Flocking, changes at both the signal and scheduler levels are represented as trees of unit generators. The only difference is the rate at which these unit generators are evaluated. A single abstract for changes provides less ``conceptual surface" for newcomers to learn, and enables instruments to be used in different contexts, both at the macro and micro levels.
+
+This aspect of Flocking remains a work in progress, and the work of unifying the different types of events and changes within a computer music system represents, in the minds of the authors, a highly germane area for ongoing research.
 
 \section{The Framework}
 
@@ -211,6 +213,10 @@ Since JSON's syntax and semantics are identical to the Object and Array type lit
 Infusion, infusion, infusion, example of infusion.
 
 (example of what an infused band of instruments looks like)
+
+\section{Scheduling}
+
+This approach was inspired by an insight in James Tenney's (cite Computer Music Experiences, 1961-1964), where he points out the conceptual similarity between the macrostructure of a composition (events that occur over the course of the duration of a piece of musc) and the changes that occur at the microlevel of unit generators. In the early 1960s, Tenney attempted to use Music IV's unit generators as the basis for specifying composition-level changes, and commented that the instruments ''produced results that were quite interesting to me, but it was not very efficient to use the compiler itself for these operations\ldots [requiring] a separation between the compositional procedures and the actual sample-generation" (cite page 18-19 of the PDF version at http://stevenmmiller.net/course_materials/courses_06_Fall/Handouts/Tenney-CME1961-1964.pdf). This suggests that the architectural rift between composition-level and signal-level changes, which has been inherited by several generations of computer music systems since the 1960s, was born out of early performance issues. Few would doubt that the performance factors of today's music systems are the same as they were on early mainframe computers.
 
 \section{Web Audio}
 
