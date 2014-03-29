@@ -155,6 +155,12 @@ var synth = flock.synth({
 
 \end{verbatim}
 
+\section{The Approach}
+
+Much computer music research over the past few decades has focused on {\it syntax} and the idea that what computer musicians need most is new syntatic means for expressing musical and time-based constructs programmatically (need to cite someone here, probably Dannenberg---any suggestions, Adam?). Though this emphasis on syntax has the produced noteworthy computer music environments (e.g. SuperCollider, ChucK, Aura, etc.) and useful results for particular musical use cases such as live coding, the preponderance of isolated, specialist programming languages for music and art has lead to, in the opinion of the first author, a ``ghettoization" of creative coders from the mainstream world of software developers. While specialist languages can undoubtedly be useful for teaching and experimentation, they often result in ``roads to nowhere" as an artist's creative vocabulary expands beyond the limits of what is possible within the system. SuperCollider, as an example of a very successful musician-specialist programming language and environment, provides myriad ways to express time-based concepts, yet it continues to be difficult to create polished user interfaces or to connect with web-based services and sources of data---tasks that are trivial in mainstream programming environments such as JavaScript. As the world of interconnected devices, sensors, and participatory software increases, these limitations take an increasing toll on the complexity of creative coding, serving to separate musicians and artist from other programmers working in the field.
+
+In order to address this concern, Flocking was conceived from the beginning as means for connecting musicians and artists up with the cross-platform, distributed delivery model of web technologies, as well as the larger pool of libraries, user interface components, and tutorials, that are available to the web development community.
+
 
 \section{The Framework}
 
@@ -216,6 +222,13 @@ Avoiding the temptation to focus on micro-benchmarking and premature optimizatio
 
 With just-in-time compilers such as Google's V8 and Mozilla's IonMonkey, we believe that real-world performance is best achieved by using simple algorithms that represent stable ``hot loops" that can be quickly and permanently  compiled into machine code by the runtime. The risk of micro-optimization efforts such as the code-generation techniques promoted by Gibberish is ``lumpy" (i.e. indeterminate) real-world performance caused by the JavaScript runtime having to re-trace and recompile code. This is particularly an issue when code needs to be dynamically generated and evaluated whenever the signal graph changes, such as the introduction of new synths or unit generators into the pipeline. Flocking avoids this risk while maintaining competitive performance by using algorithm for traversing and evaluating unit generators. Synth nodes and unit generators are stored in flat, ordered lists. Flocking is able to quickly iterate through these lists and evaluate each signal generator in order. Synth nodes and unit generators can be added or removed from the pipeline at any time without forcing the JavaScript runtime to spill its caches when evaluating a new piece of code. This helps to ensure that Flocking's performance profile remains stable and consistent at runtime. Despite very little optimization effort to date, preliminary benchmarks (cite https://github.com/colinbdclark/webaudio-performance-benchmarks) suggest that Flocking's approach is promising both from the perspective of good performance as well as greater simplicity and maintainability in comparison to systems that use more complex code generation techniques.
 
+\section{Next Steps}
+
+\begin{itemize}
+  \item Improve the the declarative scheduler's ability to schedule a variety of events efficiently, including the ability to inject sample-accurate changes into the main signal graph
+  \item A new Flocking development environment that allows synths to be edited both as JSON and graphically with boxes and wires
+  \item Web Audio ``islands," enabling users to freely interleave Flocking unit generators with native Web Audio nodes
+\end{itemize}
 
 %\section{Floats and equations}
 
