@@ -8,6 +8,7 @@
 \usepackage{times}
 \usepackage{ifpdf}
 \usepackage[english]{babel}
+\usepackage{flushend}
 %\usepackage{cite}
 
 %%%%%%%%%%%%%%%%%%%%%%%% Some useful packages %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -132,7 +133,7 @@ Flocking\footnote{http://flockingjs.org/} is a framework for audio synthesis and
 
 In Flocking, instruments and scores are defined as JavaScript Object Notation (JSON) objects. JSON is a subset of the JavaScript language that is used widely across the web for exchanging data. By representing the basic building blocks of synthesis declaratively, Flocking's goal is to enable the growth of an ecosystem of tools that can easily parse and understand the logic and semantics of digital instruments. This is particularly useful for supporting generative composition (where programs generate new instruments and scores algorithmically), graphical tools (for programmers and non-programmers alike to collaborate), and new modes of social programming that allow musicians to easily adapt, extend, and rework existing instruments without having to ``fork" their code.
 
-In contrast to other emerging web audio libraries and tools, Flocking provides a robust, optimized, and well-tested architecture that explicitly supports extensibility and long-term growth. Flocking runs in nearly any modern JavaScript environment, including desktop and mobile browsers (Chrome, Firefox, and Safari), as well as on embedded devices with Node.js.
+Flocking provides a robust, optimized, and well-tested architecture that explicitly supports extensibility and long-term growth. Flocking runs in nearly any modern JavaScript environment, including desktop and mobile browsers (Chrome, Firefox, and Safari), as well as on embedded devices with Node.js.
 
 \end{abstract}
 %
@@ -422,7 +423,7 @@ With just-in-time compilers such as Google's V8\footnote{https://code.google.com
 
 Flocking's data-oriented approach can be useful for a variety of musical and social purposes. For example, a generative music application can algorithmically produce JSON synthDefs on the fly that introduce new instruments or variations on existing instruments into the system. Similarly, a graphical development environment, such the in-progress Flocking Playground (see figure \ref{fig:playground}), can traverse a synthDef and produce a rendering that allows users to interact with their instruments visually, modifying the wiring between unit generators in sync with the source view. With the rise of JSON data stores such as CouchDB and MongoDB, Flocking synthDefs can potentially even be shared socially, stored in a community database and indexed, queried, and reused in ways that would be much more difficult with ordinary imperative code.
 
-\begin{figure}[ht]
+\begin{figure}[ht!]
 \centering
 \includegraphics[width=0.9\columnwidth]{images/flocking-playground-source-view.png}
 \caption{ A screenshot of Flocking's interactive programming environment.\label{fig:playground}}
@@ -434,7 +435,7 @@ Flocking's data-oriented approach can be useful for a variety of musical and soc
 \caption{ A screenshot of an in-development patching GUI for Flocking.\label{fig:graphical}}
 \end{figure}
 
-The new Flocking Playground is being built with Fluid Infusion\footnote{http://fluidproject.org/products/infusion}, a JavaScript framework that supports end-user personalization and development \cite{hcii2014}. Infusion's infrastructure for relaying, transforming, and firing changes across diverse models within an application will be critical for maintaining synchronization between the graphical and source views of the Playground. We also envision that Infusion's {\it Change Applier} infrastructure will help support live coding in the Playground using an ``on the fly change recognition" approach not unlike that described in Bret Victor's {\it Inventing on Principle}\cite{inventingonprinciple}. (Adam how do we cite a video in bibtex format? https://vimeo.com/36579366)
+The new Flocking Playground is being built with Fluid Infusion\footnote{http://fluidproject.org/products/infusion}, a JavaScript framework that supports end-user personalization and development \cite{hcii2014}. Infusion's infrastructure for relaying, transforming, and firing changes across diverse models within an application will be critical for maintaining synchronization between the graphical and source views of the Playground. We also envision that Infusion's {\it Change Applier} infrastructure will help support live coding in the Playground using an ``on the fly change recognition" approach not unlike that described in Bret Victor's {\it Inventing on Principle}\cite{victor2012inventing}.
 
 \subsection{Greater Web Audio Integration}
 
@@ -445,15 +446,16 @@ We are in the midst of planning an updated version of the Flocking architecture 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=0.9\columnwidth]{images/flocking-web-audio-islands.png}
-\caption{ A diagram showing how Flocking will support mixing unit generators with native Web Audio API nodes.\label{fig:graphical}}
+\caption{ A diagram showing how Flocking will support mixing unit generators with native Web Audio API nodes.\label{fig:webaudioflocking}}
 \end{figure}
 
 This architecture change will also help prepare Flocking for Web Worker-based ScriptProcessorNodes, which are planned for a future version of the Web Audio specification\footnote{https://github.com/WebAudio/web-audio-api/issues/113}.
 
 \section{Conclusions}
-Awesomeness has been demonstrated.
 
-\nocite{*} % just to put everything in reference section for now
+Flocking is a new framework for computer music composition that leverages existing technologies and ideas to create a robust, flexibile, and expressive tool. Flocking combines the UGEN pattern from many canonical computer music languages inside of WebAudio technologies to allow users to interact with existing and future web technologies. Users interact with Flocking using a declarative programming syntax. 
+
+Various examples of web IDEs using both text and graphical environments have been demonstrated. Not only does Flocking provide users with a clear and expressive syntax but performance metrics indicate that the framework design yields superior performance.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
