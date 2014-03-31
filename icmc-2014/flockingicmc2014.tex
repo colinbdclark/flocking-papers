@@ -145,17 +145,6 @@ This paper will demonstrate Flocking's expressivity with a discussion of the dec
 
 Flocking is a programming framework rather than a programming language or environment. It is implemented in Javascript to make it available to a multitude of platforms and to fit naturally into the wider ecosystem of web tools.
 
-
-\begin{verbatim}
-var synth = flock.synth({
-    synthDef: {
-        ugen: "flock.ugen.sinOsc",
-        freq: 440,
-        mul: 0.25
-    }
-});
-\end{verbatim}
-
 \section{The Approach}
 
 Much computer music research over the past few decades has focused on {\it syntax} and the idea that what computer musicians need most is new syntactic ways to express musical and time-based constructs programmatically (need to cite someone here, probably Dannenberg---any suggestions, Adam?). Though this emphasis on syntax has produced noteworthy computer music languages (e.g. SuperCollider, ChucK, Aura, etc.) and useful results for use cases such as live coding, the preponderance of isolated, specialist programming languages for music and art has lead to, in the opinion of the first author, a separation of creative coders from the mainstream world of software developers. While specialist languages can undoubtedly be useful for teaching and experimentation, they often result in ``roads to nowhere" as an artist's creative vocabulary expands beyond the limits of what is possible within the system. SuperCollider, as an example of a very successful musician-specialist programming language, provides myriad ways to express time-based concepts, yet it continues to be difficult to create polished user interfaces or to connect with web-based services and sources of data---tasks that are trivial in mainstream programming environments such as JavaScript. As the world of interconnected devices, sensors, and participatory software increases, these limitations take an increasing toll on the complexity of creative coding, serving to separate musicians and artists from other programmers working in the field.
@@ -181,18 +170,29 @@ Born out of frustration with the confusing syntactic and semantic separation of 
 
 \section{How Flocking Works}
 
-Cover:
+\subsection{The Framework}
+
+The core of the Flocking framework consists of a handful of components that provide the essential behaviour for interpreting and instantiating synths, generating samples, and scheduling changes. The most important components include:
 
 \begin{enumerate}
-\item the main components of the system: the environment, synths, unit generators, and the scheduler
-\item an example of a simple synth, and how they are invoked with an ``options document" containing a ``synthDef"
-\item discuss the idea of layering---that flocking is built from low-level functions plus a framework that operates on common data structures in an ``inversion of control" manner
-\item show a more complex example of a synth and how values can be changed on it
+\item the {\it Flocking interpreter}, which parses and instantiates synths, unit generators, and buffers
+\item the {\it Environment}, which represents the overall audio system and its configuration settings
+\item {\it Audio Strategies}, which are pluggable audio output backends (such as the Web Audio API or ALSA on Node.js)
+\item Synths, which represent instruments or collections of signal-generating logic
+\item {\it Unit Generators} (ugens), which are the sample-generating primitives used to create synths
+\item the {\it Scheduler}, which manages time-based change events on a synth
 \end{enumerate}
 
-\section{The Framework}
+The following diagram shows the runtime relationships between the components that comprise the Flocking framework, showing an example of how multiple synths and unit generators are composed into a single Web Audio ScriptProcessorNode.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\columnwidth]{images/flocking-component-architecture.png}
+\caption{ A screenshot of Flocking's interactive programming environment.\label{fig:architecture}}
+\end{figure}
 
 \subsection{Declarative Programming}
+
 We described Flocking above as a declarative framework, and this characteristic is essential to understanding its design. Declarative programming can be understood in the context of Flocking as having two essential characteristics:
 
 \begin{enumerate}
@@ -206,7 +206,20 @@ The second point, relating to the use of common data structures to represent pro
 
 In contrast, declarative programming involves the ability to write programs that are represented in a format that can be processed by other programs as ordinary data. The Lisp family of languages are a well-known example of this approach. Paul Graham describes the declarative nature of Lisp, saying it ``has no syntax. You write programs in the parse trees... [that] are fully accessible to your programs. You can write programs that manipulate them... programs that write programs." Though Flocking is written in ordinary JavaScript, it shares with Lisp the approach of expressing programs within data structures (written as JSON) that are fully available for manipulation by other programs.
 
-For example, a complex graph of unit generators is represented in Flocking as a tree of JSON objects, each of which specifies:
+\subsection{JSON}
+
+The key to Flocking's declarative approach is JSON, the JavaScript Object Notation format. JSON is a lightweight data interchange format based on a subset of JavaScript that can be parsed and manipulated in nearly any programming language (Crockford {\it json.org}). JSON provides two primary data structures that are practically universal across programming languages:
+
+\begin{itemize}
+\item objects consisting of key/value pairs (i.e. dictionaries or associative arrays)
+\item ordered lists (i.e. arrays or vectors)
+\end{itemize}
+
+Since JSON's syntax and semantics are identical to the Object and Array type literals in JavaScript, JSON is an exceptionally convenient language for representing data in web applications. All of Flocking's musical primitives are expressed as trees of JSON objects. These objects can be trivially serialized, traversed, manipulated, and merged with other objects. Where Max and PD provide compositionality by creating patch objects, and SuperCollider and ChucK provide this with functions, Flocking enables exceptional compositionality through the creation of ``documents" (declarative JSON specifications) that can be reused and extended with a simple document merging algorithm provided by the framework.
+
+\subsection{Unit and Synth Definitions}
+
+Developers working with Flocking don't typically instantiate unit generators directly. Instead, they compose JSON objects into trees. Each node in the tree, called {\it unit generator definitions} (ugenDefs), describes a unit generator and its connection with others in the signal-processing graph. A ugenDef includes the following information:
 
 \begin{enumerate}
 \item the type of unit generator that should be instantiated
@@ -214,14 +227,67 @@ For example, a complex graph of unit generators is represented in Flocking as a 
 \item a named set of static options, which describe how the unit generator should be configured
 \end{enumerate}
 
+Here's a simple example of a sine wave oscillator:
+
 \begin{verbatim}
- (example of moderately complex tree of unit generators)
+{
+    ugen: "flock.ugen.sinOsc",
+    inputs: {
+        freq: 440,
+        mul: 0.25
+    },
+    options: {
+        interpolation: "linear"
+    }
+}
 \end{verbatim}
 
-As can be seen in the code example above, developers working with Flocking don't typically instantiate unit generators directly. Instead, they compose these JSON unit generator trees to form {\it synth definitions} (synthDefs), delegating the process of instantiating the live graph of unit generators to the Flocking framework. Unit generator types are expressed as dot-separated strings called {\it key paths} or {\it EL expressions}. These strings are bound to unit generator creator functions at instantiation time by Flocking.
+As can be seen in the code example above, unit generator types are expressed as dot-separated strings called {\it key paths} or {\it EL expressions}. These strings are bound to unit generator creator functions at instantiation time by Flocking. All type expressions refer to a global namespace hierarchy so that developers can easily contribute their own unit generator implementations (using their own namespace to avoid conflicts) and have the Flocking framework manage them in the same manner as any of the built-in types.
+
+A collection of unit generator definitions form the basis for a {\it synth definition} (synthDef). Synth definitions describe a complete instrument to be instantiated by the Flocking framework. Synths typically include a connection to an output bus---either the speakers or a shared ``interconnect" bus. In this manner, Flocking's architecture is highly inspired by SuperCollider.
+
+Cover:
+\begin{enumerate}
+\item how a synth is instantiated
+\item layering--low level functions plus a framework
+\item changing values on a synth--how ``cutpoint ids" are defined
+\end{enumerate}
+
+Here is an example of a modestly complex Flocking synth that performs frequency modulation. A sine wave unit generator is modulated by another sine wave. The modulator frequency and amplitude are controlled by the position of the user's mouse on the web page.
+
+\begin{verbatim}
+{
+    ugen: "flock.ugen.out",
+    sources: {
+        ugen: "flock.ugen.sin",
+        freq: {
+            ugen: "flock.ugen.value",
+            value: 400,
+            add: {
+                ugen: "flock.ugen.sin",
+                freq: {
+                    ugen: "flock.ugen.mouse.cursor",
+                    mul: 124,
+                    add: 62,
+                },
+                mul: {
+                    ugen: "flock.ugen.mouse.cursor",
+                    mul: 100,
+                    add: 100,
+                    options: {
+                        axis: "y"
+                    }
+                }
+            }
+        },
+        mul: 0.3
+    }
+}
+\end{verbatim}
+
+\subsection{The Benefit of a Declarative System}
 
 This declarative format can be used for other purposes, too. For example, a generative music application can algorithmically produce JSON synthDefs on the fly that introduce new instruments or variations on existing instruments into the system. Similarly, a graphical development environment, such the in-progress Flocking Playground (shown below), can traverse a synthDef and produce a rendering that allows users to interact with their instruments visually, modifying the wiring between unit generators in sync with the source view. With the rise of JSON data stores such as CouchDB and MongoDB, Flocking synthDefs can potentially even be shared socially, stored in a community database and indexed, queried, and reused in ways that would be much more difficult with ordinary imperative code.
-
 
 \begin{figure}[h]
 \centering
@@ -234,18 +300,6 @@ This declarative format can be used for other purposes, too. For example, a gene
 \includegraphics[width=0.9\columnwidth]{images/flocking-playground-graphical-view.png}
 \caption{ A screenshot of an in-development patching GUI for Flocking.\label{fig:graphical}}
 \end{figure}
-
-
-\subsection{JSON}
-
-The key to Flocking's declarative approach is JSON, the JavaScript Object Notation format. JSON is a lightweight data interchange format based on a subset of JavaScript that can be parsed and manipulated in nearly any programming language (Crockford {\it json.org}). JSON provides two primary data structures that are practically universal across programming languages:
-
-\begin{enumerate}
-\item objects consisting of key/value pairs (i.e. dictionaries or associative arrays)
-\item ordered lists (i.e. arrays or vectors)
-\end{enumerate}
-
-Since JSON's syntax and semantics are identical to the Object and Array type literals in JavaScript, JSON is an exceptionally convenient language for representing data in web applications. All of Flocking's musical primitives are expressed as trees of JSON objects. These objects can be trivially serialized, traversed, manipulated, and merged with other objects. Where Max and PD provide compositionality by creating patch objects, and SuperCollider and ChucK provide this with functions, Flocking enables exceptional compositionality through the creation of ``documents" (declarative JSON specifications) that can be reused and extended with a simple document merging algorithm enabled by the Infusion framework.
 
 \subsection{Infusion}
 
@@ -293,9 +347,7 @@ var beatScheduler = flock.scheduler.async.tempo({
 
 \end{verbatim}
 
-A full version of this example, written in the Infusion style, is available as part of the Flocking documentation.
-
-In this example, a change is defined with the following parameters:
+A full version of this example, written in the Infusion style, is available as part of the Flocking documentation. In this example, a change is defined with the following parameters:
 
 \begin{itemize}
 \item it should be repeatedly applied, every beat (lines x and y)
