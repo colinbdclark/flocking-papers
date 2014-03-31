@@ -130,7 +130,7 @@
 \begin{abstract}
 Flocking\footnote{http://flockingjs.org/} is a framework for audio synthesis and music composition written in JavaScript. It takes a unique approach to solving several of the common architectural problems faced by computer music environments, emphasizing a declarative style that is closely aligned with the principles of the web.
 
-In Flocking, instruments and scores are defined as JavaScript Object Notation (JSON) objects. JSON is a subset of the JavaScript language that is used widely across the web for exchanging data. By representing the basic building blocks of synthesis declaratively, Flocking’s goal is to enable the growth of an ecosystem of tools that can easily parse and understand the logic and semantics of a digital instrument. This is particularly useful for supporting generative composition (where programs generate new instruments and scores algorithmically), graphical tools (for programmers and non-programmers alike to collaborate), and new modes of social programming that allow musicians to easily adapt, extend, and rework existing instruments without having to ``fork" their code.
+In Flocking, instruments and scores are defined as JavaScript Object Notation (JSON) objects. JSON is a subset of the JavaScript language that is used widely across the web for exchanging data. By representing the basic building blocks of synthesis declaratively, Flocking’s goal is to enable the growth of an ecosystem of tools that can easily parse and understand the logic and semantics of digital instruments. This is particularly useful for supporting generative composition (where programs generate new instruments and scores algorithmically), graphical tools (for programmers and non-programmers alike to collaborate), and new modes of social programming that allow musicians to easily adapt, extend, and rework existing instruments without having to ``fork" their code.
 
 In contrast to other emerging web audio libraries and tools, Flocking provides a robust, optimized, and well-tested architecture that explicitly supports extensibility and long-term growth. Flocking runs in nearly any modern JavaScript environment, including desktop and mobile browsers (Chrome, Firefox, and Safari), as well as on embedded devices with Node.js.
 
@@ -139,23 +139,23 @@ In contrast to other emerging web audio libraries and tools, Flocking provides a
 
 \section{Introduction}\label{sec:introduction}
 
-Many computer music programming tools have been developed to enable musicians, composers, artists, students, and explorers to engage music through code. Each tool solves a particular problem of efficiency, expressivity, or portability. Many aim to make advances in all three areas - Flocking is a new computer music programming framework that aims to achieve exactly this.
+Many computer music programming tools have been developed to enable musicians, composers, artists, students, and explorers to engage with music through code. Each tool attempts solves a particular problem of efficiency, expressivity, or portability. Many aim to make advances in all three areas - Flocking is a new computer music programming framework that aims to achieve exactly this.
 
-This paper will demonstrate Flocking's expressivity with a discussion of the declarative nature paradigm utilized, efficiency with a discussion of optimization tactics for javascript webaudio languages and a comparison with other languages, and portability with a discussion of the underlying framework and Flocking's ability to communicate with other tools (GUI, MIDI, OSC, etc).
+This paper will demonstrate Flocking's expressivity with a discussion of the declarative paradigm utilized, efficiency with a discussion of optimization tactics for JavaScript web audio toolkits and a comparison with other libraries, and portability with a discussion of the underlying framework and Flocking's ability to communicate with other tools (GUI, MIDI, OSC, etc).
 
-Flocking is a programming framework rather than a programming language or environment. It is implemented in Javascript to make it available to a multitude of platforms and to fit naturally into the wider ecosystem of web tools.
+Flocking is a programming framework rather than a programming language or environment. It is implemented in JavaScript to make it available to a broad range of platforms and to fit naturally into the wider ecosystem of web tools.
 
 \section{The Approach}
 
-Much computer music research over the past few decades has focused on {\it syntax} and the idea that what computer musicians need most is new syntactic ways to express musical and time-based constructs programmatically (need to cite someone here, probably Dannenberg---any suggestions, Adam?). Though this emphasis on syntax has produced noteworthy computer music languages (e.g. SuperCollider, ChucK, Aura, etc.) and useful results for use cases such as live coding, the preponderance of isolated, specialist programming languages for music and art has lead to, in the opinion of the first author, a separation of creative coders from the mainstream world of software developers. While specialist languages can undoubtedly be useful for teaching and experimentation, they often result in ``roads to nowhere" as an artist's creative vocabulary expands beyond the limits of what is possible within the system. SuperCollider, as an example of a very successful musician-specialist programming language, provides myriad ways to express time-based concepts, yet it continues to be difficult to create polished user interfaces or to connect with web-based services and sources of data---tasks that are trivial in mainstream programming environments such as JavaScript. As the world of interconnected devices, sensors, and participatory software increases, these limitations take an increasing toll on the complexity of creative coding, serving to separate musicians and artists from other programmers working in the field.
+Much computer music research over the past few decades has focused on {\it syntax} and the idea that what computer musicians need most are new syntactic ways to express musical and time-based constructs programmatically (need to cite someone here, probably Dannenberg---any suggestions, Adam?). Though this emphasis on syntax has produced noteworthy computer music languages (e.g. SuperCollider, ChucK, Aura, etc.) and useful results for use cases such as live coding, the preponderance of isolated, specialist programming languages for music and art has led to, in the opinion of the first author, a disconnect between creative coders and the mainstream world of software developers. While specialist languages can undoubtedly be useful for teaching and experimentation, they often result in ``roads to nowhere" as an artist's creative vocabulary expands beyond the limits of what is possible within the system. SuperCollider, as an example of a very successful musician-specialist programming language, provides myriad ways to express time-based concepts, yet it continues to be difficult to create polished user interfaces or to connect with web-based services and sources of data---tasks that are trivial in mainstream programming environments such as JavaScript. As the world of interconnected devices, sensors, and participatory software increases, these limitations take an increasing toll on the complexity of creative coding, serving to separate musicians and artists from other programmers working in the field.
 
-In order to address this concern, Flocking was conceived from the beginning as means for connecting musicians and artists up with the cross-platform, distributed delivery model of the web, along with the larger pool of libraries, user interface components, and tutorials that are available to the web development community.
+In order to address this concern, Flocking was conceived from the beginning as a means for connecting musicians and artists up with the cross-platform, distributed delivery model of the web, along with the larger pool of libraries, user interface components, and tutorials that are available to the web development community.
 
-Another motivating concern for Flocking is that the prevailing emphasis on syntax has shifted focus away from interoperability amongst tools and systems within an open computer music ecosystem. Today, binary oppositions prevail; a prospective computer musician typically must choose from the outset whether or not she wants to use a code-based environment (such as CSound, SuperCollider, and ChucK) or a graphical one (Max/MSP or Pd, for example). Since imperative programming code can't easily be parsed or generated by tools outside the chosen environment, the code and graphical paradigms rarely interoperate; as a result, it is difficult for musicians to collaborate on a project across modalities. Tools such as Open Sound Control (cite OSC specification) go some way to enabling cross-system interoperability at runtime, and some environments such as Max support the embedding of programmatic code ``externals" within an otherwise graphical instrument, but these solutions don't allow programmers and non-programmers alike to collaborate on the same underlying instruments and scores.
+Another motivating concern for Flocking is that the prevailing emphasis on syntax has shifted focus away from interoperability amongst tools and systems within an open computer music ecosystem. Today, binary oppositions prevail; a prospective computer musician typically must choose from the outset whether or not she wants to use a code-based environment (such as CSound, SuperCollider, or ChucK) or a graphical one (Max/MSP or Pd, for example). Since imperative programming code can't easily be parsed or generated by tools outside the chosen environment, the code and graphical paradigms rarely interoperate. As a result, it is difficult for musicians to collaborate on a project across modalities. Tools such as Open Sound Control (cite \verb|http://cnmat.berkeley.edu/node/7002|) go some way to enabling cross-system interoperability at runtime. Some environments such as Max support the embedding of programmatic code ``externals" within an otherwise graphical instrument, but these solutions don't allow programmers and non-programmers alike to collaborate on the same underlying instruments and scores.
 
 Flocking's use of declarative programming idioms, which are discussed in more detail below, is intended to support {\it metaprogramming}, enabling new kinds of both graphical and textual tools within the larger context of web-based music. There is significant work still to be done in this regard---a prototype code and graphical development environment for Flocking is still in early development---but the declarative approach provides a foundation for deeply exploring the issue of interoperability and collaboration.
 
-Another key challenge that computer music environments often face is how to model the architectural distinction between different types of changes that occur at varying time scales. Such changes include:
+Another key challenge that computer music systems often face is how to model the architectural distinction between different types of changes that occur at varying time scales. Such changes include:
 
 \begin{enumerate}
 \item highly optimized data flow-based changes that occur at the signal level
@@ -164,7 +164,7 @@ Another key challenge that computer music environments often face is how to mode
 \item user-triggered events from an OSC or MIDI controller, or from graphical user interface components such as buttons and knobs
 \end{enumerate}
 
-Different computer music systems take radically different approaches to modelling these distinctions. For example, Max historically supported only an event-based approach that was optimized for changes coming from an external controller; signal processing was added later as a special type of message (cite Puckett, Max at 17 \verb|http://msp.ucsd.edu/Publications/dartmouth-reprint.pdf|). SuperCollider, on the other hand, makes a strict distinction between signal-level changes, which occur in the isolated environment of the server (cite McCartney) and {\it Patterns}, which provide a completely different syntactic construct for scheduling higher-level musical changes (cite SuperCollider Book Patterns chapter).
+Different computer music systems take radically different approaches to modelling these distinctions. For example, Max historically supported only an event-based approach that was optimized for changes coming from an external controller; signal processing was added later as a special type of message (cite Puckett, Max at 17 \verb|http://msp.ucsd.edu/Publications/dartmouth-reprint.pdf|). SuperCollider, on the other hand, makes a strict distinction between signal-level changes, which occur in the isolated environment of the server (cite McCartney) and {\it Patterns}, which provide a completely different syntactic construct for scheduling higher-level musical changes (cite Kuivila, Events and Patterns in SuperCollider Book page 189).
 
 Born out of frustration with the confusing syntactic and semantic separation of unit generators from Patterns in SuperCollider---both of which attempt to represent sources of changing values over time---Flocking aims to smooth over this systemic distinction between signal-level events and scheduled events. It does this by adopting a single, unified representation of change. In Flocking, value changes within an instrument and changes that are scheduled as part of the compositional structure of a piece are both represented as trees of unit generators. The only difference is the rate at which these unit generators are evaluated. A single abstraction for change provides less ``conceptual surface" for newcomers to learn, and enables instruments to be used in different contexts, both at the macro and micro levels. This topic is discussed further, with examples, in the \ref{sec:Scheduling} section.
 
@@ -172,14 +172,14 @@ Born out of frustration with the confusing syntactic and semantic separation of 
 
 \subsection{The Framework}
 
-The core of the Flocking framework consists of a handful of components that provide the essential behaviour for interpreting and instantiating synths, generating samples, and scheduling changes. The most important components include:
+The core of the Flocking framework consists of several interconnected components that provide the essential behaviour of interpreting and instantiating unit generators, producing streams of samples, and scheduling changes. Flocking's primary components include:
 
 \begin{enumerate}
 \item the {\it Flocking interpreter}, which parses and instantiates synths, unit generators, and buffers
 \item the {\it Environment}, which represents the overall audio system and its configuration settings
-\item {\it Audio Strategies}, which are pluggable audio output backends (such as the Web Audio API or ALSA on Node.js)
-\item Synths, which represent instruments or collections of signal-generating logic
-\item {\it Unit Generators} (ugens), which are the sample-generating primitives used to create synths
+\item {\it Audio Strategies}, which are pluggable audio output adaptors (binding to backends such as the Web Audio API or ALSA on Node.js)
+\item {\it Unit Generators} (ugens), which are the sample-generating primitives used to produce sound
+\item {\it Synths}, which represent instruments and collections of signal-generating logic
 \item the {\it Scheduler}, which manages time-based change events on a synth
 \end{enumerate}
 
@@ -193,7 +193,7 @@ The following diagram shows the runtime relationships between the components tha
 
 \subsection{Declarative Programming}
 
-We described Flocking above as a declarative framework, and this characteristic is essential to understanding its design. Declarative programming can be understood in the context of Flocking as having two essential characteristics:
+We described Flocking above as a declarative framework, and this characteristic is essential to understanding its design. Declarative programming can be understood in the context of Flocking as having two essential aspects:
 
 \begin{enumerate}
 \item it emphasizes a high-level, semantic view of a program’s logic and structure
@@ -208,18 +208,24 @@ In contrast, declarative programming involves the ability to write programs that
 
 \subsection{JSON}
 
-The key to Flocking's declarative approach is JSON, the JavaScript Object Notation format. JSON is a lightweight data interchange format based on a subset of JavaScript that can be parsed and manipulated in nearly any programming language (Crockford {\it json.org}). JSON provides two primary data structures that are practically universal across programming languages:
+The key to Flocking's declarative approach is JSON, the JavaScript Object Notation format. JSON is a lightweight data interchange format based on a subset of JavaScript that can be parsed and manipulated in nearly any programming language (Crockford {\it json.org}). JSON provides several primary data type and structures that are practically universal across programming languages. The following table describes these data structures and their syntax:
 
-\begin{itemize}
-\item objects consisting of key/value pairs (i.e. dictionaries or associative arrays)
-\item ordered lists (i.e. arrays or vectors)
-\end{itemize}
+\begin{tabular}{| l | l | l |}
+    \hline
+    Type & Syntax & Description \\ \hline
+    Object & \verb|{}| & Associative array of key/value pairs \\ \hline
+    Array & \verb|[]| & An ordered list \\ \hline
+    String & \verb|"cat"| & A character sequence \\ \hline
+    Number & \verb|440.4| & A floating point number \\ \hline
+\end{tabular}
 
-Since JSON's syntax and semantics are identical to the Object and Array type literals in JavaScript, JSON is an exceptionally convenient language for representing data in web applications. All of Flocking's musical primitives are expressed as trees of JSON objects. These objects can be trivially serialized, traversed, manipulated, and merged with other objects. Where Max and PD provide compositionality by creating patch objects, and SuperCollider and ChucK provide this with functions, Flocking enables exceptional compositionality through the creation of ``documents" (declarative JSON specifications) that can be reused and extended with a simple document merging algorithm provided by the framework.
+Since JSON's syntax and semantics are identical to JavaScript's own type literals, JSON is an exceptionally convenient language for representing data in web applications without requiring additional parsing complexity. All of Flocking's musical primitives are expressed as trees of JSON objects. These objects can be trivially serialized, traversed, manipulated, and merged with other objects.
+
+In comparison to other music programming environments, which often describe themselves as functional or object-oriented, Flocking weaves the two approaches together in a manner that could be called ``document-oriented." Where Max and PD provide compositionality by creating patch objects, and SuperCollider and ChucK provide this with functions, Flocking enables exceptional compositionality through the creation of ``documents" (declarative JSON specifications) that can be reused and extended with a simple document merging algorithm provided by the framework.
 
 \subsection{Unit and Synth Definitions}
 
-Developers working with Flocking don't typically instantiate unit generators directly. Instead, they compose JSON objects into trees. Each node in the tree, called {\it unit generator definitions} (ugenDefs), describes a unit generator and its connection with others in the signal-processing graph. A ugenDef includes the following information:
+Musicians working with Flocking don't typically instantiate unit generators directly. Instead, they compose JSON objects into trees. Each node in the tree, called {\it unit generator definitions} (ugenDefs), describes a unit generator and its connection to others in the signal-processing graph. A ugenDef includes the following information:
 
 \begin{enumerate}
 \item the type of unit generator that should be instantiated
@@ -227,7 +233,7 @@ Developers working with Flocking don't typically instantiate unit generators dir
 \item a named set of static options, which describe how the unit generator should be configured
 \end{enumerate}
 
-Here's a simple example of a sine wave oscillator:
+Here's a simple example of a sine wave oscillator, illustrating how a Flocking unit generator is defined using JSON:
 
 \begin{verbatim}
 {
@@ -242,15 +248,15 @@ Here's a simple example of a sine wave oscillator:
 }
 \end{verbatim}
 
-As can be seen in the code example above, unit generator types are expressed as dot-separated strings called {\it key paths} or {\it EL expressions}. These strings are bound to unit generator creator functions at instantiation time by Flocking. All type expressions refer to a global namespace hierarchy so that developers can easily contribute their own unit generator implementations (using their own namespace to avoid conflicts) and have the Flocking framework manage them in the same manner as any of the built-in types.
+Unit generator types are expressed as dot-separated strings called {\it key paths} or {\it EL expressions}. These strings are bound to ugen creator functions at instantiation time by Flocking. All type expressions refer to a global namespace hierarchy so that developers can easily contribute their own unit generator implementations (using their own namespace to avoid conflicts) and have the Flocking framework manage them in the same manner as any of the built-in types.
 
-A collection of unit generator definitions form the basis for a {\it synth definition} (synthDef). Synth definitions describe a complete instrument to be instantiated by the Flocking framework. Synths typically include a connection to an output bus---either the speakers or a shared ``interconnect" bus. In this manner, Flocking's architecture is highly inspired by SuperCollider.
+A collection of unit generator definitions form the basis for a {\it synth definition} (synthDef). Synth definitions describe a complete instrument to be instantiated by the Flocking framework. Synths typically include a connection to an output bus---either the speakers or a shared ``interconnect" bus. In this respect, Flocking's architecture is highly inspired by SuperCollider (cite SuperCollider book page 25).
 
-Cover:
+Still to cover:
 \begin{enumerate}
 \item how a synth is instantiated
 \item layering--low level functions plus a framework
-\item changing values on a synth--how ``cutpoint ids" are defined
+\item changing values on a synth--how ``cutpoint ids" are defined and then changes sent to them
 \end{enumerate}
 
 Here is an example of a modestly complex Flocking synth that performs frequency modulation. A sine wave unit generator is modulated by another sine wave. The modulator frequency and amplitude are controlled by the position of the user's mouse on the web page.
@@ -287,7 +293,7 @@ Here is an example of a modestly complex Flocking synth that performs frequency 
 
 \subsection{The Benefit of a Declarative System}
 
-This declarative format can be used for other purposes, too. For example, a generative music application can algorithmically produce JSON synthDefs on the fly that introduce new instruments or variations on existing instruments into the system. Similarly, a graphical development environment, such the in-progress Flocking Playground (shown below), can traverse a synthDef and produce a rendering that allows users to interact with their instruments visually, modifying the wiring between unit generators in sync with the source view. With the rise of JSON data stores such as CouchDB and MongoDB, Flocking synthDefs can potentially even be shared socially, stored in a community database and indexed, queried, and reused in ways that would be much more difficult with ordinary imperative code.
+Flocking's data-oriented approach can be useful for a variety of musical and social purposes. For example, a generative music application can algorithmically produce JSON synthDefs on the fly that introduce new instruments or variations on existing instruments into the system. Similarly, a graphical development environment, such the in-progress Flocking Playground (shown below), can traverse a synthDef and produce a rendering that allows users to interact with their instruments visually, modifying the wiring between unit generators in sync with the source view. With the rise of JSON data stores such as CouchDB and MongoDB, Flocking synthDefs can potentially even be shared socially, stored in a community database and indexed, queried, and reused in ways that would be much more difficult with ordinary imperative code.
 
 \begin{figure}[h]
 \centering
