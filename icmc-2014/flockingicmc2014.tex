@@ -293,7 +293,7 @@ Here is an example of a modestly complex Flocking synth that performs frequency 
 
 \subsection{The Benefit of a Declarative System}
 
-Flocking's data-oriented approach can be useful for a variety of musical and social purposes. For example, a generative music application can algorithmically produce JSON synthDefs on the fly that introduce new instruments or variations on existing instruments into the system. Similarly, a graphical development environment, such the in-progress Flocking Playground (shown below), can traverse a synthDef and produce a rendering that allows users to interact with their instruments visually, modifying the wiring between unit generators in sync with the source view. With the rise of JSON data stores such as CouchDB and MongoDB, Flocking synthDefs can potentially even be shared socially, stored in a community database and indexed, queried, and reused in ways that would be much more difficult with ordinary imperative code.
+Flocking's data-oriented approach can be useful for a variety of musical and social purposes. For example, a generative music application can algorithmically produce JSON synthDefs on the fly that introduce new instruments or variations on existing instruments into the system. Similarly, a graphical development environment, such the in-progress Flocking Playground (see figure \ref{fig:playground}), can traverse a synthDef and produce a rendering that allows users to interact with their instruments visually, modifying the wiring between unit generators in sync with the source view. With the rise of JSON data stores such as CouchDB and MongoDB, Flocking synthDefs can potentially even be shared socially, stored in a community database and indexed, queried, and reused in ways that would be much more difficult with ordinary imperative code.
 
 \begin{figure}[h]
 \centering
@@ -322,33 +322,36 @@ Cover:
 
 As mentioned above, Flocking attempts to unify the means for expressing both micro- and macro-level changes in a composition. Where other systems create a fundamental semantic and syntactic distinction between these different types of changes (e.g. Synths and Patterns in SuperCollider), instruments and scheduled events are both specified in Flocking using a tree of unit generators. This enables the same instruments that are used to define the note-level timbre and texture of a piece to also be reused to shape the larger-scale phrasing and structure of the music. Here is an example of how changes are scheduled using Flocking's declarative scheduler to create drum machine:
 
-\begin{verbatim}
+
+Explain the comments outside of the code listing. 
 // Assume there is a synth already running named "synth",
 // which will trigger a drum sound whenever its inputTrigger value is set to 1.
-
 // Create an synchronous scheduler
 // (i.e. one that runs outside the sample generation pipeline)
-var beatScheduler = flock.scheduler.async.tempo({
-    // The scheduler's clock should tick at 180 bpm.
-    bpm: 180,
 
-    // Schedule a repeating change every beat.
-    score: {
-        interval: "repeat",
-        time: 1,
-        change: {
-            synth: "synth",
-            values: {
-                "trig.source": {
-                    synthDef: {
-                        ugen: "flock.ugen.sequence",
-                        list: [1, 1, 0, 1, 1, 0, 1, 0],
-                        loop: 1
-                    }
-                }
-            }
+
+\begin{verbatim}
+var beatScheduler = flock.scheduler.async.tempo({
+  // The scheduler's clock should tick at 180 bpm.
+  bpm: 180,
+
+  // Schedule a repeating change every beat.
+  score: {
+    interval: "repeat",
+    time: 1,
+    change: {
+      synth: "synth",
+      values: {
+        "trig.source": {
+           synthDef: {
+             ugen: "flock.ugen.sequence",
+             list: [1, 1, 0, 1, 1, 0, 1, 0],
+             loop: 1
+          }
         }
+      }
     }
+  }
 });
 
 \end{verbatim}
