@@ -170,9 +170,10 @@ Another challenge that computer music systems face is how to model the architect
 \item user-triggered events from an OSC or MIDI controller, or from graphical user interface components such as buttons and knobs
 \end{enumerate}
 
-Different computer music systems take radically different approaches to modelling these distinctions. For example, Max historically supported only an event-based approach that was optimized for changes coming from an external controller; signal processing was added later as a special type of message \cite{puckette2002max}. SuperCollider, on the other hand, makes a strict distinction between signal-level changes, which occur in the isolated environment of the server \cite{mccartney1996supercollider} and {\it Patterns}, which provide a completely different syntactic construct for scheduling higher-level musical changes \cite[pp. 189]{wilson2011supercollider}.
+Different computer music systems take radically different approaches to modelling these distinctions. For example, Max historically supported only an event-based approach that was optimized for changes coming from an external controller; signal processing was added later as a special type of message \cite{puckette2002max}.
+SuperCollider, on the other hand, makes a semantic and syntactic distinction between the signal-level changes performed by unit generators on the server \cite{mccartney1996supercollider} and {\it Patterns}, which form a completely different abstraction for change \cite[pp. 189]{wilson2011supercollider}.
 
-Born out of frustration with the confusing syntactic and semantic separation of unit generators from Patterns in SuperCollider---both of which attempt to represent sources of changing values over time---Flocking aims to smooth over this systemic distinction between signal-level events and scheduled events. It does this by adopting a single, unified representation of change. In Flocking, value changes within an instrument and changes that are scheduled as part of the compositional structure of a piece are both represented as trees of unit generators. The only difference is the rate at which these unit generators are evaluated. A single abstraction for change provides less ``conceptual surface" for newcomers to learn, and enables instruments to be used in different contexts, both at the macro and micro levels. This topic is discussed further, with examples, in the \ref{sec:Scheduling} section.
+Born out of frustration with these overlapping, incompatible abstractions in SuperCollider---both of which attempt to represent sources of changing values over time---Flocking aims to smooth over this systemic distinction between signal-level events and scheduled events. It does this by adopting a single, unified representation of change. In Flocking, value changes within an instrument and changes that are scheduled as part of the compositional structure of a piece are both represented as trees of unit generators. The only difference is the rate at which these unit generators are evaluated. A single abstraction for change provides less ``conceptual surface" for newcomers to learn, and enables instruments to be used in different contexts, both at the macro and micro levels. This topic is discussed further, with examples, in the \ref{sec:Scheduling} section.
 
 \section{How Flocking Works}
 
@@ -243,14 +244,14 @@ Below is a simple example of a sine wave oscillator, illustrating how a Flocking
 
 \begin{verbatim}
 {
-    ugen: "flock.ugen.sinOsc",
-    inputs: {
-        freq: 440,
-        mul: 0.25
-    },
-    options: {
-        interpolation: "linear"
-    }
+  ugen: "flock.ugen.sinOsc",
+  inputs: {
+    freq: 440,
+    mul: 0.25
+  },
+  options: {
+    interpolation: "linear"
+  }
 }
 \end{verbatim}
 
@@ -262,46 +263,44 @@ A collection of unit generator definitions form the basis for a {\it synth defin
 
 \begin{verbatim}
 {
-    ugen: "flock.ugen.out",
-    sources: [
-        {
-            ugen: "flock.ugen.sinOsc"
-        },
-        {
-            ugen: "flock.ugen.sinOsc",
-            inputs: {
-                freq: 444
-            }
-        }
-    ]
+  ugen: "flock.ugen.out",
+  sources: [
+    {
+      ugen: "flock.ugen.sinOsc"
+    },
+    {
+      ugen: "flock.ugen.sinOsc",
+      freq: 444
+    }
+  ]
 }
 \end{verbatim}
 
-This example illustrates a key aspect of Flocking's interpreter and its document-merging approach. In the case of the first unit generator, we have omitted all input values. When the synth is actually played, it will automatically be given a frequency of 440 Hz. This is due to the fact that every built-in unit generator declares a set of default values. The Flocking interpreter, prior to instantiating the unit generator, will merge the user's ugenDef values on top of the defaults. If a property is omitted, the default value will be retained; if a user specified a property, it will be omitted.
+This example illustrates a key aspect of Flocking's interpreter and its document-merging approach. In the case of the first unit generator, we have omitted all input values. When the synth is actually played, it will automatically be given a frequency of 440 Hz. This is due to the fact that every built-in unit generator declares a set of default values. The Flocking interpreter, prior to instantiating the unit generator, will merge the user's ugenDef values on top of the defaults. If a property is omitted, the default value will be retained; if a user specified a property, it will be omitted. To save typing, the interpreter will also handle input names correctly when they aren't nested inside an ``inputs" container.
 
 To actually instantiate a Synth, its creator function must be called. In Flocking, a component creator function typically takes only one argument---the component's {\it options} structure---and returns an instance of the component. In the case of Synths, the options object must include the synthDef as well as any other settings needed to appropriately configure the synth instance. Here is an example of how to create a Flocking synth programmatically:
 
 \begin{figure}[h!]
     \begin{verbatim}
-    var synth = flock.synth({
-      synthDef: {
-        id: "carrier",
+var synth = flock.synth({
+  synthDef: {
+    id: "carrier",
+    ugen: "flock.ugen.sinOsc",
+    freq: 440,
+    phase: {
+      id: "mod",
+      ugen: "flock.ugen.sinOsc",
+      freq: 34.0,
+      mul: {
         ugen: "flock.ugen.sinOsc",
-        freq: 440,
-        phase: {
-          id: "mod",
-          ugen: "flock.ugen.sinOsc",
-          freq: 34.0,
-          mul: {
-            ugen: "flock.ugen.sinOsc",
-            freq: 1/20,
-            mul: flock.PI
-          },
-          add: flock.PI
-        },
-        mul: 0.25
-      }
-    });
+        freq: 1/20,
+        mul: flock.PI
+      },
+      add: flock.PI
+    },
+    mul: 0.25
+  }
+});
     \end{verbatim}
     \caption{Instantiating a custom phase modulation synth.\label{fig:pmSynth}}
 \end{figure}
@@ -318,10 +317,10 @@ In order to direct changes at a particular unit generator, it has to be given an
 Changes can be targeted at any unit generator within the tree by using key path expressions. Here's an example of how multiple changes can be made to different points in the unit generator tree with a single call to \verb|Synth.set()|:
 
 \begin{verbatim}
-    synth.set({
-        "carrier.freq": 220,
-        "mod.mul.freq": 1/30
-    });
+  synth.set({
+    "carrier.freq": 220,
+    "mod.mul.freq": 1/30
+  });
 \end{verbatim}
 
 This example lowers the frequency of the carrier oscillator by an octave while simultaneously slowing down the rate that the modulator's amplitude is oscillating at.
@@ -334,20 +333,11 @@ This hierarchical path-based scheme for addressing Flocking's graph of signal ge
 
 As mentioned above, Flocking attempts to unify the means for expressing both micro- and macro-level changes in a composition. Where other systems create a fundamental semantic and syntactic distinction between these different types of changes (e.g. Synths and Patterns in SuperCollider), instruments and scheduled events are both specified in Flocking using a tree of unit generators. This enables the same instruments that are used to define the note-level timbre and texture of a piece to also be reused to shape the larger-scale phrasing and structure of the music. Here is an example of how changes are scheduled using Flocking's declarative scheduler to create drum machine:
 
-
-Explain the comments outside of the code listing.
-// Assume there is a synth already running named "synth",
-// which will trigger a drum sound whenever its inputTrigger value is set to 1.
-// Create an synchronous scheduler
-// (i.e. one that runs outside the sample generation pipeline)
-
-
-\begin{verbatim}
-var beatScheduler = flock.scheduler.async.tempo({
-  // The scheduler's clock should tick at 180 bpm.
+\begin{figure}[h!]
+    \begin{verbatim}
+flock.scheduler.async.tempo({
   bpm: 180,
 
-  // Schedule a repeating change every beat.
   score: {
     interval: "repeat",
     time: 1,
@@ -355,20 +345,26 @@ var beatScheduler = flock.scheduler.async.tempo({
       synth: "synth",
       values: {
         "trig.source": {
-           synthDef: {
-             ugen: "flock.ugen.sequence",
-             list: [1, 1, 0, 1, 1, 0, 1, 0],
-             loop: 1
+          synthDef: {
+            ugen: "flock.ugen.sequence",
+            list: [
+              1, 1, 0, 1,
+              1, 0, 1, 0
+            ],
+            loop: 1
           }
         }
       }
     }
   }
 });
+    \end{verbatim}
+    \caption{Scheduling changes with the Flocking Scheduler.\label{fig:schedulerEx}}
+\end{figure}
 
-\end{verbatim}
+This example assumes that there is already a synth running (aptly named ``synth"), which will produce a drum sound whenever its trigger input changes. First, we instantiate an asynchronous tempo scheduler---a type of scheduler that runs outside of the sample generation pipeline and that ticks at the specified beats per minute rate. Currently there are only asynchronous Schedulers in Flocking---a sample-accurate implementation is in the planning stages.
 
-A full version of this example, written in the Infusion style, is available as part of the Flocking documentation. In this example, a change is defined with the following parameters:
+The details of the desired change event are specified in the ``score" section of the example. A scheduled change is defined with the following parameters:
 
 \begin{itemize}
 \item it should be repeatedly applied, every beat
@@ -386,6 +382,8 @@ This synthDef is interpreted by the Flocking scheduler, producing a new value on
 \end{enumerate}
 
 The scheduler automatically takes care of parsing a JSON-based change specification, producing a {\it value synth} running at the specified schedule rate, and targeting its stream of changes to the desired instrument synth.
+
+A full version of the example in figure \ref{fig:schedulerEx}, which also illustrates how synths and schedulers can be woven together in an entirely declarative way, is available in the Flocking examples repository on Github\footnote{https://github.com/colinbdclark/flocking-examples/blob/master/drum-machine/drum-machine.js}.
 
 \subsection{Motivations}
 
@@ -429,34 +427,41 @@ With just-in-time compilers such as Google's V8\footnote{https://code.google.com
 
 \subsection{The Flocking Playground}
 
-Flocking's data-oriented approach can be useful for a variety of musical and social purposes. For example, a generative music application can algorithmically produce JSON synthDefs on the fly that introduce new instruments or variations on existing instruments into the system. Similarly, a graphical development environment, such the in-progress Flocking Playground  (see figure \ref{fig:playground}), can traverse a synthDef and produce a rendering that allows users to interact with their instruments visually, modifying the wiring between unit generators in sync with the source view. With the rise of JSON data stores such as CouchDB and MongoDB, Flocking synthDefs can potentially even be shared socially, stored in a community database and indexed, queried, and reused in ways that would be much more difficult with ordinary imperative code.
+Flocking's data-oriented approach can be useful for a variety of musical and social purposes. For example, a generative music application can algorithmically produce JSON synthDefs on the fly that introduce new instruments or variations on existing instruments into the system. Similarly, a graphical development environment, such the in-progress Flocking Playground (see figure \ref{fig:playground}), can traverse a synthDef and produce a rendering that allows users to interact with their instruments visually, modifying the wiring between unit generators in sync with the source view. With the rise of JSON data stores such as CouchDB and MongoDB, Flocking synthDefs can potentially even be shared socially, stored in a community database and indexed, queried, and reused in ways that would be much more difficult with ordinary imperative code.
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
 \includegraphics[width=0.9\columnwidth]{images/flocking-playground-source-view.png}
 \caption{ A screenshot of Flocking's interactive programming environment.\label{fig:playground}}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
 \includegraphics[width=0.9\columnwidth]{images/flocking-playground-graphical-view.png}
 \caption{ A screenshot of an in-development patching GUI for Flocking.\label{fig:graphical}}
 \end{figure}
 
-Still to cover
-\begin{itemize}
-  \item potential for Infusion
-  \item Web Audio ``islands," enabling users to freely interleave Flocking unit generators with native Web Audio nodes
-\end{itemize}
+The new Flocking Playground is being built with Fluid Infusion\footnote{http://fluidproject.org/products/infusion}, a JavaScript framework that supports end-user personalization and development \cite{hcii2014}. Infusion's infrastructure for relaying, transforming, and firing changes across diverse models within an application will be critical for maintaining synchronization between the graphical and source views of the Playground. We also envision that Infusion's model infrastructure will help support live coding in the Playground using an ``on the fly change merging" approach not unlike that described in Bret Victor's {\it Inventing on Principle}\cite{inventingonprinciple}. (Adam how do we cite a video in bibtex format? https://vimeo.com/36579366)
+
+\subsection{Greater Web Audio Integration}
+
+Due to the fact that Flocking takes control of the sample generation process directly, it uses very few features of the W3C Web Audio API. As the specification evolves, plans are underway to adopt more of its features. At the moment, Flocking consists of a single ScriptProcessorNode that is directly connected to the Web Audio API's destination sink. This currently precludes---or makes very difficult---the use of the powerful native Nodes offered by Web Audio, including the Panner, Waveshaper, and Analyser nodes.
+
+We are in the midst of planning an updated version of the Flocking architecture that allows for Flocking unit generators to be interleaved with native Web Audio nodes. Nicknamed ``islands," this approach will make a complete separation between unit generators and synths, introducing a proxy unit generator type that adapts inputs between a native node and a Flocking unit generator.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.9\columnwidth]{images/flocking-web-audio-islands.png}
+\caption{ A diagram showing how Flocking will support mixing unit generators with native Web Audio API nodes.\label{fig:graphical}}
+\end{figure}
+
+This architecture change will also help prepare Flocking for Web Worker-based ScriptProcessorNodes, which are planned for a future version of the Web Audio specification\footnote{https://github.com/WebAudio/web-audio-api/issues/113}.
 
 \section{Conclusions}
 Awesomeness has been demonstrated.
 
 \nocite{*} % just to put everything in reference section for now
 
-\begin{acknowledgments}
-Funding agencies? Pets?
-\end{acknowledgments}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %bibliography here
