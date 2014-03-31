@@ -334,33 +334,36 @@ This hierarchical path-based scheme for addressing Flocking's graph of signal ge
 
 As mentioned above, Flocking attempts to unify the means for expressing both micro- and macro-level changes in a composition. Where other systems create a fundamental semantic and syntactic distinction between these different types of changes (e.g. Synths and Patterns in SuperCollider), instruments and scheduled events are both specified in Flocking using a tree of unit generators. This enables the same instruments that are used to define the note-level timbre and texture of a piece to also be reused to shape the larger-scale phrasing and structure of the music. Here is an example of how changes are scheduled using Flocking's declarative scheduler to create drum machine:
 
-\begin{verbatim}
+
+Explain the comments outside of the code listing.
 // Assume there is a synth already running named "synth",
 // which will trigger a drum sound whenever its inputTrigger value is set to 1.
-
 // Create an synchronous scheduler
 // (i.e. one that runs outside the sample generation pipeline)
-var beatScheduler = flock.scheduler.async.tempo({
-    // The scheduler's clock should tick at 180 bpm.
-    bpm: 180,
 
-    // Schedule a repeating change every beat.
-    score: {
-        interval: "repeat",
-        time: 1,
-        change: {
-            synth: "synth",
-            values: {
-                "trig.source": {
-                    synthDef: {
-                        ugen: "flock.ugen.sequence",
-                        list: [1, 1, 0, 1, 1, 0, 1, 0],
-                        loop: 1
-                    }
-                }
-            }
+
+\begin{verbatim}
+var beatScheduler = flock.scheduler.async.tempo({
+  // The scheduler's clock should tick at 180 bpm.
+  bpm: 180,
+
+  // Schedule a repeating change every beat.
+  score: {
+    interval: "repeat",
+    time: 1,
+    change: {
+      synth: "synth",
+      values: {
+        "trig.source": {
+           synthDef: {
+             ugen: "flock.ugen.sequence",
+             list: [1, 1, 0, 1, 1, 0, 1, 0],
+             loop: 1
+          }
         }
+      }
     }
+  }
 });
 
 \end{verbatim}
@@ -396,6 +399,10 @@ The scheduling aspect of Flocking remains very much a work in progress, and the 
 
 \section{Web Audio}
 
+It is the opinion of the authors that the current W3C Web Audio API (cite http://www.w3.org/TR/webaudio/), without the support of additional libraries, is insufficient to support the expressivity required by creative musicians. Many of the limitations of the API are outlined in detail in \cite{DBLP:journals/comj/WyseS13}. Web Audio currently provides limited options for web developers who want to create their own custom synthesis algorithms in JavaScript and expect them to perform well. In particular, it is difficult to mix native and JavaScript-based nodes in the same signal graph without imposing latency and synchronization issues.
+
+Flocking predates the first Web Audio API implementation, and was architected specifically to allow web developers to contribute their own first-class signal processing implementations in an open way. As a result of this philosophy, and due to the performance and developer experience issues of the current Web Audio specification, Flocking uses only small parts of the API. Instead, it takes full control of the sample-generation process and provides musicians with an open palette of signal-generating building blocks that can be used to assemble sophisticated digital instruments.
+
 \subsection{Relationship to the Web Audio API}
 
 It is the opinion of the authors that the current W3C Web Audio API (cite http://www.w3.org/TR/webaudio/), without the support of additional libraries, is insufficient to support the expressivity required by creative musicians. Many of the limitations of the API are outlined in detail in (cite Wyse and Subramanian). Web Audio currently provides limited options for web developers who want to create their own custom synthesis algorithms in JavaScript and expect them to perform well. In particular, it is difficult to mix native and JavaScript-based nodes in the same signal graph without imposing latency and synchronization issues.
@@ -404,25 +411,25 @@ Flocking predates the first Web Audio API implementation, and was architected sp
 
 \subsection{Comparison with Web Audio Libraries}
 
-Several other libraries also take a similar ``all JavaScript" approach. {\it Gibberish} \cite{roberts_web_2013} and {\it CoffeeCollider} (cite Mohayonao http://mohayonao.github.io/CoffeeCollider/) are two prominent alternatives to Flocking. CoffeeCollider attempts to replicate the SuperCollider language as closely as possible using the CoffeeScript programming language (cite Ashkenas http://coffeescript.org/), while Gibberish takes a more traditional object-oriented approach. Although these environments each offer their own unique features, neither has attempted to stray far from the conventional models established by existing music programming environments.
+Several other libraries also take a similar ``all JavaScript" approach. {\it Gibberish} \cite{roberts_web_2013} and {\it CoffeeCollider} \cite{Mohayonao} are two prominent alternatives to Flocking. CoffeeCollider attempts to replicate the SuperCollider language as closely as possible using the CoffeeScript programming language \cite{Ashkenas}, while Gibberish takes a more traditional object-oriented approach. Although these environments each offer their own unique features, neither has attempted to stray far from the conventional models established by existing music programming environments.
 
-Flocking, too, has taken architectural inspiration from several existing music programming environments, particularly the design of the SuperCollider 3 synthesis server. Flocking shares with scsynth a simple ``functions and state" architecture for unit generators, as well as a strict (conceptual) separation between the realtime constraints of the signal-processing world and the more dynamic and event-driven application space (cite McCartney Rethinking the Computer Music Language, CMJ page 64).
+Flocking, too, has taken architectural inspiration from several existing music programming environments, particularly the design of the SuperCollider 3 synthesis server. Flocking shares with scsynth a simple ``functions and state" architecture for unit generators, as well as a strict (conceptual) separation between the realtime constraints of the signal-processing world and the more dynamic and event-driven application space \cite[pp. 64]{mccartney2002rethinking}.
 
 \subsection{Performance}
 
-Much has been written about web audio performance issues related to the current generation of JavaScript runtimes generally (lack of deterministic, incremental garbage collection) and the Web Audio API specifically (the requirement for ScriptProcessorNodes to run on the main browser thread) (cite Wyse and Subramanian) (cite Roberts). If history is any indication, it seems likely that the performance characteristics of the JavaScript language will continue to improve as the browser performance wars continue to rage between Mozilla, Google, and Apple. In addition, Web Worker-based strategies for sample generation are currently being discussed for inclusion in the Web Audio API specification (cite \verb|https://github.com/WebAudio/web-audio-api/issues/113|).
+Much has been written about web audio performance issues related to the current generation of JavaScript runtimes generally (lack of deterministic, incremental garbage collection) and the Web Audio API specifically (the requirement for ScriptProcessorNodes to run on the main browser thread) \cite{DBLP:journals/comj/WyseS13,roberts_web_2013}. If history is any indication, it seems likely that the performance characteristics of the JavaScript language will continue to improve as the browser performance wars continue to rage between Mozilla, Google, and Apple. In addition, Web Worker-based strategies for sample generation are currently being discussed for inclusion in the Web Audio API specification\footnote{https://github.com/WebAudio/web-audio-api/issues/113}.
 
-In the interim, many claims have been made about the relative performance merits of various optimization strategies used in toolkits such as Gibberish (cite Roberts). Most of these claims, however, focus on micro-benchmarks that measure the cost of small-scale operations in isolation, rather than taking into account the performance of real-world signal processing algorithms.
+In the interim, many claims have been made about the relative performance merits of various optimization strategies used in toolkits such as Gibberish \cite{roberts_web_2013}. Most of these claims, however, focus on micro-benchmarks that measure the cost of small-scale operations in isolation, rather than taking into account the performance of real-world signal processing algorithms.
 
 Avoiding the temptation to focus on micro-benchmarking and premature optimization, the approach we have taken in Flocking is to build an architecture and framework that can serve as a flexible, long-term foundation on which to continually evolve new features and improved performance. Significant effort has been invested into developing automated unit and performance tests for Flocking that measure the real-world costs of its approach.
 
-With just-in-time compilers such as Google's V8 (cite https://code.google.com/p/v8/) and Mozilla's IonMonkey (cite https://wiki.mozilla.org/IonMonkey/Overview), we believe that real-world performance is best achieved by using simple algorithms that represent stable ``hot loops" that can be quickly and permanently  compiled into machine code by the runtime. The risk of micro-optimization efforts such as the code-generation techniques promoted by Gibberish is ``lumpy" (i.e. indeterminate) real-world performance caused by the JavaScript runtime having to re-trace and recompile code. This is particularly an issue when code needs to be dynamically generated and evaluated whenever the signal graph changes, such as the introduction of new synths or unit generators into the pipeline. Flocking avoids this risk while maintaining competitive performance by using a simple algorithm for traversing and evaluating unit generators. Synth nodes and unit generators are stored in flat, ordered lists. Flocking is able to quickly iterate through these lists and evaluate each signal generator in order. Synth nodes and unit generators can be added or removed from the pipeline at any time without forcing the JavaScript runtime to spill its caches when evaluating a new piece of code. This helps to ensure that Flocking's performance profile remains stable and consistent at runtime. Despite very little optimization effort to date, preliminary benchmarks (cite \verb|https://github.com/colinbdclark/webaudio-performance-benchmarks|) suggest that Flocking's approach is promising both from the perspective of good performance as well as greater simplicity and maintainability in comparison to systems that use more complex code generation techniques.
+With just-in-time compilers such as Google's V8\footnote{https://code.google.com/p/v8/} and Mozilla's IonMonkey\footnote{https://wiki.mozilla.org/IonMonkey/Overview}, we believe that real-world performance is best achieved by using simple algorithms that represent stable ``hot loops" that can be quickly and permanently  compiled into machine code by the runtime. The risk of micro-optimization efforts such as the code-generation techniques promoted by Gibberish is ``lumpy" (i.e. indeterminate) real-world performance caused by the JavaScript runtime having to re-trace and recompile code. This is particularly an issue when code needs to be dynamically generated and evaluated whenever the signal graph changes, such as the introduction of new synths or unit generators into the pipeline. Flocking avoids this risk while maintaining competitive performance by using a simple algorithm for traversing and evaluating unit generators. Synth nodes and unit generators are stored in flat, ordered lists. Flocking is able to quickly iterate through these lists and evaluate each signal generator in order. Synth nodes and unit generators can be added or removed from the pipeline at any time without forcing the JavaScript runtime to spill its caches when evaluating a new piece of code. This helps to ensure that Flocking's performance profile remains stable and consistent at runtime. Despite very little optimization effort to date, preliminary benchmarks\footnote{https://github.com/colinbdclark/webaudio-performance-benchmarks} suggest that Flocking's approach is promising both from the perspective of good performance as well as greater simplicity and maintainability in comparison to systems that use more complex code generation techniques.
 
 \section{Current and Upcoming Projects}
 
 \subsection{The Flocking Playground}
 
-Flocking's data-oriented approach can be useful for a variety of musical and social purposes. For example, a generative music application can algorithmically produce JSON synthDefs on the fly that introduce new instruments or variations on existing instruments into the system. Similarly, a graphical development environment, such the in-progress Flocking Playground (shown below), can traverse a synthDef and produce a rendering that allows users to interact with their instruments visually, modifying the wiring between unit generators in sync with the source view. With the rise of JSON data stores such as CouchDB and MongoDB, Flocking synthDefs can potentially even be shared socially, stored in a community database and indexed, queried, and reused in ways that would be much more difficult with ordinary imperative code.
+Flocking's data-oriented approach can be useful for a variety of musical and social purposes. For example, a generative music application can algorithmically produce JSON synthDefs on the fly that introduce new instruments or variations on existing instruments into the system. Similarly, a graphical development environment, such the in-progress Flocking Playground  (see figure \ref{fig:playground}), can traverse a synthDef and produce a rendering that allows users to interact with their instruments visually, modifying the wiring between unit generators in sync with the source view. With the rise of JSON data stores such as CouchDB and MongoDB, Flocking synthDefs can potentially even be shared socially, stored in a community database and indexed, queried, and reused in ways that would be much more difficult with ordinary imperative code.
 
 \begin{figure}[h]
 \centering
