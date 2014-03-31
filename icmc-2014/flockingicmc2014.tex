@@ -281,27 +281,31 @@ This example illustrates a key aspect of Flocking's interpreter and its document
 
 To actually instantiate a Synth, its creator function must be called. In Flocking, a component creator function typically takes only one argument---the component's {\it options} structure---and returns an instance of the component. In the case of Synths, the options object must include the synthDef as well as any other settings needed to appropriately configure the synth instance. Here is an example of how to create a Flocking synth programmatically:
 
-\begin{verbatim}
-var synth = flock.synth({
-  synthDef: {
-    id: "carrier",
-    ugen: "flock.ugen.sinOsc",
-    freq: 440,
-    phase: {
-      id: "mod",
-      ugen: "flock.ugen.sinOsc",
-      freq: 34.0,
-      mul: {
+\begin{figure}[h!]
+    \begin{verbatim}
+    var synth = flock.synth({
+      synthDef: {
+        id: "carrier",
         ugen: "flock.ugen.sinOsc",
-          freq: 1/20,
-          mul: flock.PI
-      },
-      add: flock.PI
-    },
-    mul: 0.25
-  }
-});
-\end{verbatim}
+        freq: 440,
+        phase: {
+          id: "mod",
+          ugen: "flock.ugen.sinOsc",
+          freq: 34.0,
+          mul: {
+            ugen: "flock.ugen.sinOsc",
+            freq: 1/20,
+            mul: flock.PI
+          },
+          add: flock.PI
+        },
+        mul: 0.25
+      }
+    });
+    \end{verbatim}
+    \caption{Instantiating a custom phase modulation synth.\label{fig:pmSynth}}
+\end{figure}
+
 
 By default, synths are automatically added to the tail of the Environment's list of nodes to evaluate, so they will start sounding immediately if the Environment has been started. Synths also respond to \verb|play| and \verb|pause| messages; a call to \verb|play()| will add the synth and start the environment if necessary.
 
@@ -309,36 +313,24 @@ By default, synths are automatically added to the tail of the Environment's list
 
 Once a synth has been instantiated, its inputs can be changed on the fly. Flocking supports a highly dynamic signal processing pipeline; unit generators can be added or swapped out from a synth at any time, even while it's playing. Behind the scenes, everything in the signal graph is actually a unit generator, even static values.
 
-In order to direct changes at a particular unit generator, it has to be given an identifying name. Synths keep track of all their named unit generators... Flocking synths provide two methods
+In order to direct changes at a particular unit generator, it has to be given an identifying name. In the example shown in figure \ref{fig:pmSynth}, the carrier and modulator unit generators are each given an ``id" property which names them. These represent ``cutpoints" into the overall tree to enable easier access to a particular unit generator. Synths keep track of all their named unit generators and provide \verb|get()| and \verb|set()| methods for making programmatic changes to a synth's values.
 
-\subsection{The Benefit of a Declarative System}
+Changes can be targeted at any unit generator within the tree by using key path expressions. Here's an example of how multiple changes can be made to different points in the unit generator tree with a single call to \verb|Synth.set()|:
 
-Flocking's data-oriented approach can be useful for a variety of musical and social purposes. For example, a generative music application can algorithmically produce JSON synthDefs on the fly that introduce new instruments or variations on existing instruments into the system. Similarly, a graphical development environment, such the in-progress Flocking Playground (shown below), can traverse a synthDef and produce a rendering that allows users to interact with their instruments visually, modifying the wiring between unit generators in sync with the source view. With the rise of JSON data stores such as CouchDB and MongoDB, Flocking synthDefs can potentially even be shared socially, stored in a community database and indexed, queried, and reused in ways that would be much more difficult with ordinary imperative code.
+\begin{verbatim}
+    synth.set({
+        "carrier.freq": 220,
+        "mod.mul.freq": 1/30
+    });
+\end{verbatim}
 
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.9\columnwidth]{images/flocking-playground-source-view.png}
-\caption{ A screenshot of Flocking's interactive programming environment.\label{fig:playground}}
-\end{figure}
+This example lowers the frequency of the carrier oscillator by an octave while simultaneously slowing down the rate that the modulator's amplitude is oscillating at.
 
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.9\columnwidth]{images/flocking-playground-graphical-view.png}
-\caption{ A screenshot of an in-development patching GUI for Flocking.\label{fig:graphical}}
-\end{figure}
-
-\subsection{Infusion}
-
-Cover:
-
-\begin{enumerate}
-\item what Infusion is and its ``research goals" (cite the HCII paper http://colinclark.org/papers/hcii-2014.pdf, which will appear in these proceedings http://www.hcii2014.org/proceedings adam how do you cite forthcoming proceedings?)
-\item show an example of defining a ``band" and scheduler in the Infusionic way
-\item show an example of how an existing synth can be adapted, modified, and overridden without changing code (perhaps a simple FM synth is a good example, so we can contrast it with something like Gibberish, where you have to take their synths or leave em.)
-\item the infusionic approach is a choice, but increasingly higher-level abstractions will be offered using this approach, where the band is just the first example
-\end{enumerate}
+This hierarchical path-based scheme for addressing Flocking's graph of signal generators is very similar to Open Sound Control's {\it addresses}, which provide a similarly hierarchical means for addressing arbitrary message targets. Indeed, OSC messages can be easily adapted into Flocking change specifications; this is accomplished with only a few lines of code in the new Flocking OSC library for Node.js\footnote{https://github.com/colinbdclark/flocking-osc/}.
 
 \section{Scheduling} \label{sec:Scheduling}
+
+\subsection{Unit Generators Represent Change}
 
 As mentioned above, Flocking attempts to unify the means for expressing both micro- and macro-level changes in a composition. Where other systems create a fundamental semantic and syntactic distinction between these different types of changes (e.g. Synths and Patterns in SuperCollider), instruments and scheduled events are both specified in Flocking using a tree of unit generators. This enables the same instruments that are used to define the note-level timbre and texture of a piece to also be reused to shape the larger-scale phrasing and structure of the music. Here is an example of how changes are scheduled using Flocking's declarative scheduler to create drum machine:
 
@@ -392,9 +384,13 @@ This synthDef is interpreted by the Flocking scheduler, producing a new value on
 
 The scheduler automatically takes care of parsing a JSON-based change specification, producing a {\it value synth} running at the specified schedule rate, and targeting its stream of changes to the desired instrument synth.
 
+\subsection{Motivations}
+
 This approach was inspired by an insight in James Tenney's \cite{tenney1969computer}, where he points out the conceptual similarity between the macrostructure of a composition---events that occur over the course of the duration of a piece of music---and the changes that occur at the microlevel of unit generators. In the early 1960s, Tenney attempted to use Music IV's unit generator system as the basis for algorithmically specifying the large-scale time structure of his compositions. He commented that the instruments ''produced results that were quite interesting to me, but it was not very efficient to use the compiler itself for these operations\ldots [requiring] a separation between the compositional procedures and the actual sample-generation" \cite[p.41--42]{tenney1969computer}. This suggests that the architectural rift between composition-level and signal-level changes, which has been inherited by several generations of computer music systems since the 1960s, was born out of early performance issues.
 
 Few would doubt that the performance factors of today's computer music systems are the same as they were on early mainframe systems, and the elegance and power of using unit generator for both signal- and composition-level changes is worth revisiting. Aside from simplicity, one of the main advantages of Flocking's declarative, unit generator-based approach to scheduling changes is that it offers the potential to actually improve performance in the long run. A typical problem with computer music schedulers is ensuring that whatever work a user schedules is deterministic and optimized for real-time performance. Schedulers often have to trade off expressivity, limiting the types of changes that can be scheduled such as with the Web Audio API's AudioParms, or leave it entirely up to the user to implement event producers that are sufficiently optimized. Flocking attempts to help users express changes in a way that can be optimized automatically by the framework. An upcoming sample-accurate version of the Flocking scheduler will be able take a scheduled synthDef and, when appropriate, inject its unit generator tree directly into the signal path of the target synth, ensuring that all changes occur with as minimal overhead as possible. Nonetheless, Flocking does not currently limit users from scheduling arbitrary actions; the scheduler also supports scheduling raw functions as callbacks.
+
+\subsection{Current State}
 
 The scheduling aspect of Flocking remains very much a work in progress, and the implementation is currently somewhat buggy. More work needs to be done to unify the different types of events and changes within a computer music system, such as those coming from MIDI and OSC controllers or GUI controls. This area is, in the minds of the authors, a highly germane area for ongoing research.
 
@@ -406,7 +402,7 @@ It is the opinion of the authors that the current W3C Web Audio API (cite http:/
 
 Flocking predates the first Web Audio API implementation, and was architected specifically to allow web developers to contribute their own first-class signal processing implementations in an open way. As a result of this philosophy, and due to the performance and developer experience issues of the current Web Audio specification, Flocking uses only small parts of the API. Instead, it takes full control of the sample-generation process and provides musicians with an open palette of signal-generating building blocks that can be used to assemble sophisticated digital instruments.
 
-\subsection{Comparison with Other Web Audio Libraries}
+\subsection{Comparison with Web Audio Libraries}
 
 Several other libraries also take a similar ``all JavaScript" approach. {\it Gibberish} \cite{roberts_web_2013} and {\it CoffeeCollider} (cite Mohayonao http://mohayonao.github.io/CoffeeCollider/) are two prominent alternatives to Flocking. CoffeeCollider attempts to replicate the SuperCollider language as closely as possible using the CoffeeScript programming language (cite Ashkenas http://coffeescript.org/), while Gibberish takes a more traditional object-oriented approach. Although these environments each offer their own unique features, neither has attempted to stray far from the conventional models established by existing music programming environments.
 
@@ -422,64 +418,29 @@ Avoiding the temptation to focus on micro-benchmarking and premature optimizatio
 
 With just-in-time compilers such as Google's V8 (cite https://code.google.com/p/v8/) and Mozilla's IonMonkey (cite https://wiki.mozilla.org/IonMonkey/Overview), we believe that real-world performance is best achieved by using simple algorithms that represent stable ``hot loops" that can be quickly and permanently  compiled into machine code by the runtime. The risk of micro-optimization efforts such as the code-generation techniques promoted by Gibberish is ``lumpy" (i.e. indeterminate) real-world performance caused by the JavaScript runtime having to re-trace and recompile code. This is particularly an issue when code needs to be dynamically generated and evaluated whenever the signal graph changes, such as the introduction of new synths or unit generators into the pipeline. Flocking avoids this risk while maintaining competitive performance by using a simple algorithm for traversing and evaluating unit generators. Synth nodes and unit generators are stored in flat, ordered lists. Flocking is able to quickly iterate through these lists and evaluate each signal generator in order. Synth nodes and unit generators can be added or removed from the pipeline at any time without forcing the JavaScript runtime to spill its caches when evaluating a new piece of code. This helps to ensure that Flocking's performance profile remains stable and consistent at runtime. Despite very little optimization effort to date, preliminary benchmarks (cite \verb|https://github.com/colinbdclark/webaudio-performance-benchmarks|) suggest that Flocking's approach is promising both from the perspective of good performance as well as greater simplicity and maintainability in comparison to systems that use more complex code generation techniques.
 
-\section{Next Steps}
+\section{Current and Upcoming Projects}
 
+\subsection{The Flocking Playground}
+
+Flocking's data-oriented approach can be useful for a variety of musical and social purposes. For example, a generative music application can algorithmically produce JSON synthDefs on the fly that introduce new instruments or variations on existing instruments into the system. Similarly, a graphical development environment, such the in-progress Flocking Playground (shown below), can traverse a synthDef and produce a rendering that allows users to interact with their instruments visually, modifying the wiring between unit generators in sync with the source view. With the rise of JSON data stores such as CouchDB and MongoDB, Flocking synthDefs can potentially even be shared socially, stored in a community database and indexed, queried, and reused in ways that would be much more difficult with ordinary imperative code.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\columnwidth]{images/flocking-playground-source-view.png}
+\caption{ A screenshot of Flocking's interactive programming environment.\label{fig:playground}}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\columnwidth]{images/flocking-playground-graphical-view.png}
+\caption{ A screenshot of an in-development patching GUI for Flocking.\label{fig:graphical}}
+\end{figure}
+
+Still to cover
 \begin{itemize}
-  \item Improve the the declarative scheduler's ability to schedule a variety of events efficiently, including the ability to inject sample-accurate changes into the main signal graph
-  \item A new Flocking development environment that allows synths to be edited both as JSON and graphically with boxes and wires
+  \item potential for Infusion
   \item Web Audio ``islands," enabling users to freely interleave Flocking unit generators with native Web Audio nodes
 \end{itemize}
-
-%\section{Floats and equations}
-
-%\subsection{Equations}
-%Equations should be placed on separated lines and numbered.
-%The number should be on the right side, in parentheses.
-%\begin{equation}
-%E=mc^{2}.
-%\label{eq:Emc2}
-%\end{equation}
-
-%\pagebreak
-
-%\subsection{Figures, Tables and Captions}
-%All artwork must be centered, neat, clean, and legible. All lines should be very dark for purposes of reproduction and artwork should not be hand-drawn. The proceedings will be distributed in electronic form only, therefore color figures are allowed. However, you may want to check that your figures are understandable even if they are printed in black-and-white.
-%\begin{table}[h]
-% \begin{center}
-% \begin{tabular}{|l|l|}
-%  \hline
-%  String value & Numeric value \\
-%  \hline
-%  Hello ICMC SMC  & 2014 \\
-%  \hline
-% \end{tabular}
-%\end{center}
-% \caption{Table captions should be placed below the table.}
-% \label{tab:example}
-%\end{table}
-
-%Numbers and captions of figures and tables always appear below the figure/table. Leave 1 line space between the figure or table and the caption. Figure and tables are numbered consecutively. Captions should be Times 10~pt. Place tables/figures in text as close to the reference as possible, and preferably at the top of the page.
-
-%\begin{figure}[h]
-%\centering
-%\includegraphics[width=0.9\columnwidth]{Athens_University_main_building.pdf}
-%\caption{Figure captions should be placed below the figure,
-%exactly like this.
-%This photo shows the main building of the University of Athens.\label{fig:example}}
-%\end{figure}
-
-%Always refer to tables and figures in the main text, for example:
-%see Figure \ref{fig:example} and \tabref{tab:example}.
-
-%\begin{figure}[t]
-%\figbox{
-%\subfloat[][]{\includegraphics[width=60mm]{figure}\label{fig:subfigex_a}}\\
-%\subfloat[][]{\includegraphics[width=80mm]{figure}\label{fig:subfigex_b}}
-%}
-%\caption{Here's an example using the subfig package.\label{fig:subfigex} }
-%\end{figure}
-
-
 
 \section{Conclusions}
 Awesomeness has been demonstrated.
