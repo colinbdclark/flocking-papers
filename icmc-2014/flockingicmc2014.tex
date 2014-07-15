@@ -69,6 +69,7 @@
   ]{hyperref}  % hyperrefs are active in the pdf file after conversion
 
   \usepackage[dvips]{epsfig,graphicx}
+  \epstopdfsetup{outdir=./}
   % declare the path(s) where your graphic files are and their extensions so
   %you won't have to specify these with every instance of \includegraphics
   \graphicspath{{./figures/}}
@@ -131,7 +132,7 @@
 \begin{abstract}
 Flocking\footnote{http://flockingjs.org/} is a framework for audio synthesis and music composition written in JavaScript. It takes a unique approach to solving several of the common architectural problems faced by computer music environments, emphasizing a declarative style that is closely aligned with the principles of the web.
 
-In Flocking, instruments and scores are defined as JavaScript Object Notation (JSON) objects. JSON is a subset of the JavaScript language that is used widely across the web for exchanging data.\footnote{http://json.org} Flocking's goal is to enable the growth of an ecosystem of tools that can easily parse and understand the logic and semantics of digital instruments by representing the basic building blocks of synthesis declaratively. This is particularly useful for supporting generative composition (where programs generate new instruments and scores algorithmically), graphical tools (for programmers and non-programmers alike to collaborate), and new modes of social programming that allow musicians to easily adapt, extend, and rework existing instruments without having to ``fork" their code.
+Flocking's goal is to enable the growth of an ecosystem of tools that can easily parse and understand the logic and semantics of digital instruments by representing the basic building blocks of synthesis declaratively. This is particularly useful for supporting generative composition (where programs generate new instruments and scores algorithmically), graphical tools (for programmers and non-programmers alike to collaborate), and new modes of social programming that allow musicians to easily adapt, extend, and rework existing instruments without having to ``fork" their code.
 
 Flocking provides a robust, optimized, and well-tested architecture that explicitly supports extensibility and long-term growth. Flocking runs in nearly any modern JavaScript environment, including desktop and mobile browsers (Chrome, Firefox, and Safari), as well as on embedded devices with Node.js.
 
@@ -141,7 +142,7 @@ Flocking provides a robust, optimized, and well-tested architecture that explici
 
 A prominent stream in computer music research over the past few decades has focused on the creation of specialized languages for expressing musical and time-based constructs programmatically \cite{dannenberg2002language,wang2003chuck,mccartney1996supercollider,orlarey2009faust}. This emphasis on new forms of syntax and language-level expression has produced noteworthy computer music environments and useful results for many use cases such as live coding. Nonetheless, there is a risk involved in the proliferation of such isolated, specialist programming languages for music and art: an increased gap between creative coders and the resources available to mainstream software developers. For example, in many self-contained computer music environments, it continues to be difficult to create polished user interfaces or to connect with web-based services and sources of data---tasks that are common in mainstream programming environments such as JavaScript. As artists and musicians increasingly use networked devices, sensors, and collaboration in their work, these limitations take an increasing toll on the complexity and scalability of creative coding.
 
-Flocking is an open source JavaScript framework that aims to address some of these concerns by connecting musicians and artists with the cross-platform, distributed delivery model of the web, and with the larger pool of libraries, user interface components, and tutorials that are available to the web development community.
+Flocking is an open source JavaScript framework that aims to address some of these concerns by connecting musicians and artists with the cross-platform, distributed delivery model of the web, and with the larger pool of libraries, user interface components, and tutorials that are available to the web development community.  In Flocking, instruments and scores are defined as JavaScript Object Notation (JSON) objects. JSON is a subset of the JavaScript language that is used widely across the web for exchanging data.\footnote{http://json.org} 
 
 \subsection{Interoperability in Context}
 
@@ -400,7 +401,7 @@ Avoiding the temptation to focus on micro-benchmarking and premature optimizatio
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.9\columnwidth]{images/FlockingVsGibberish.pdf}
+\includegraphics[width=0.9\columnwidth]{images/FlockingVsGibberish20ptFont.pdf}
 \caption{ A comparison of performance between Flocking and Gibberish. Smaller bars are faster. \label{fig:flockingvsgibberish}}
 \end{figure}
 
